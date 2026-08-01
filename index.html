@@ -3,547 +3,1752 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kaizen Finance | Continuous Improvement</title>
+    <title>Absence Generator</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Standard Global Supabase SDK -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        slate: {
+                            850: '#151e2e',
+                            900: '#0f172a',
+                            950: '#020617',
+                        }
+                    },
+                    animation: {
+                        'led-pulse': 'ledPulse 3s infinite',
+                        'slide-up': 'slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
+                        'fade-in': 'fadeIn 0.4s ease-out',
+                    },
+                    keyframes: {
+                        ledPulse: {
+                            '0%, 100%': { boxShadow: '0 0 5px rgba(56, 189, 248, 0.2), inset 0 0 0px rgba(56, 189, 248, 0)' },
+                            '50%': { boxShadow: '0 0 20px rgba(56, 189, 248, 0.4), inset 0 0 10px rgba(56, 189, 248, 0.1)' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: 0 },
+                            '100%': { transform: 'translateY(0)', opacity: 1 },
+                        },
+                        fadeIn: {
+                            '0%': { opacity: 0 },
+                            '100%': { opacity: 1 },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-        
         body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #0F172A;
-            color: #F1F5F9;
+            background-color: #020617;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(14, 165, 233, 0.15) 0, transparent 50%), 
+                radial-gradient(at 100% 100%, rgba(37, 99, 235, 0.15) 0, transparent 50%);
+            color: #e2e8f0;
+            overflow-y: hidden;
         }
 
-        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #475569; }
+        /* Animated Background Mesh */
+        body::before {
+            content: "";
+            position: absolute;
+            top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 30px 30px;
+            animation: moveMesh 60s linear infinite;
+            pointer-events: none;
+            z-index: -1;
+        }
+        @keyframes moveMesh {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(-30px, -30px); }
+        }
 
-        .glass {
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.5); }
+        ::-webkit-scrollbar-thumb { background: #1e40af; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3b82f6; }
+
+        /* Modern Glass Panel */
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(24px);
+            border: 1px solid rgba(56, 189, 248, 0.15);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+        .glass-panel:hover {
+            border-color: rgba(56, 189, 248, 0.3);
+        }
+
+        /* Inputs */
+        .input-field {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            color: #f0f9ff;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .input-field:focus {
+            outline: none;
+            border-color: #38bdf8;
+            background: rgba(15, 23, 42, 0.9);
+            box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2), 0 0 20px rgba(56, 189, 248, 0.1);
+            transform: translateY(-1px);
+        }
+
+        /* Buttons with Always-On LED Effect (Blue/Cyan) */
+        .btn-action {
+            background: linear-gradient(135deg, #2563eb 0%, #0891b2 100%);
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border: 1px solid #38bdf8;
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+            animation: ledPulse 3s infinite ease-in-out;
+        }
+        .btn-action:hover {
+            filter: brightness(1.2);
+            transform: translateY(-2px) scale(1.01);
+        }
+        .btn-action:active { 
+            transform: scale(0.96) translateY(0);
+            animation: none;
+            box-shadow: 0 0 5px rgba(56, 189, 248, 0.8); 
+        }
+
+        /* Module/Scenario Buttons */
+        .scenario-btn {
             background: rgba(30, 41, 59, 0.4);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        [v-cloak] { display: none; }
-
-        .animate-in {
-            animation: fadeIn 0.5s ease-out forwards;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        #deployment-error {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: #0f172a;
-            color: #ef4444;
-            padding: 2rem;
-            z-index: 9999;
-            font-family: monospace;
-            text-align: center;
-            justify-content: center;
-            flex-direction: column;
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-left: 4px solid rgba(148, 163, 184, 0.4);
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
             align-items: center;
+            padding-left: 1.25rem;
         }
+        .scenario-btn:hover { 
+            background: rgba(14, 165, 233, 0.1); 
+            border-color: rgba(56, 189, 248, 0.5);
+            transform: translateX(4px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .scenario-btn:active {
+            transform: scale(0.98);
+        }
+        /* Selected State */
+        .scenario-btn.selected {
+            background: linear-gradient(90deg, rgba(14, 165, 233, 0.2), rgba(30, 41, 59, 0.6));
+            border-color: #38bdf8;
+            border-left: 5px solid #38bdf8; /* Blue Accent */
+            color: #e0f2fe;
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.2);
+        }
+        .scenario-btn.selected::after {
+            content: '';
+            position: absolute;
+            right: 15px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #38bdf8;
+            box-shadow: 0 0 10px #38bdf8;
+            animation: ledPulseFast 1.5s infinite;
+        }
+
+        /* Enhanced Copy Button (Refreshed) */
+        .btn-copy {
+            position: relative;
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            overflow: hidden;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(56, 189, 248, 0.4);
+            background: rgba(15, 23, 42, 0.8);
+            color: #e0f2fe;
+            cursor: pointer;
+            box-shadow: 0 0 12px rgba(56, 189, 248, 0.15), inset 0 0 5px rgba(56, 189, 248, 0.1);
+            animation: ledPulseSmall 3s infinite ease-in-out;
+        }
+        @keyframes ledPulseSmall {
+            0%, 100% { box-shadow: 0 0 8px rgba(56, 189, 248, 0.2); border-color: rgba(56, 189, 248, 0.4); }
+            50% { box-shadow: 0 0 16px rgba(56, 189, 248, 0.5); border-color: #7dd3fc; }
+        }
+        .btn-copy:hover {
+            background: rgba(12, 74, 110, 0.8);
+            color: #ffffff;
+            transform: translateY(-2px);
+            animation: none; 
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.6);
+            border-color: #38bdf8;
+        }
+        .btn-copy:active { transform: scale(0.96); }
+        .btn-copy.btn-copied {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-color: #34d399;
+            color: white;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.6);
+            animation: none;
+        }
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Top Nav Items */
+        .top-nav-item {
+            position: relative;
+            color: #94a3b8;
+            transition: all 0.3s ease;
+        }
+        .top-nav-item:hover { color: #e0f2fe; text-shadow: 0 0 12px rgba(56, 189, 248, 0.6); transform: translateY(-1px); }
+        .top-nav-item.active { color: #38bdf8; font-weight: 700; }
+        .top-nav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: -24px;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: #38bdf8;
+            box-shadow: 0 -2px 15px rgba(56, 189, 248, 0.8);
+            border-radius: 4px 4px 0 0;
+        }
+
+        /* Toggle Tabs */
+        .toggle-btn {
+            transition: all 0.3s ease;
+        }
+        .toggle-btn.active {
+            background: #0ea5e9;
+            color: white;
+            box-shadow: 0 0 25px rgba(14, 165, 233, 0.4);
+            border: 1px solid #7dd3fc;
+        }
+        .toggle-btn:not(.active) {
+            background: rgba(30, 41, 59, 0.5);
+            color: #94a3b8;
+            border: 1px solid transparent;
+        }
+        .toggle-btn:not(.active):hover {
+            background: rgba(14, 165, 233, 0.15);
+            color: #e0f2fe;
+        }
+
+        /* Custom Checkbox */
+        .custom-checkbox {
+            appearance: none;
+            width: 1.5rem;
+            height: 1.5rem;
+            border: 2px solid rgba(148, 163, 184, 0.4);
+            border-radius: 0.375rem;
+            background-color: rgba(15, 23, 42, 0.5);
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+        .custom-checkbox:checked {
+            background-color: #0ea5e9;
+            border-color: #0ea5e9;
+            box-shadow: 0 0 10px rgba(14, 165, 233, 0.4);
+        }
+        .custom-checkbox:checked::after {
+            content: '';
+            position: absolute;
+            left: 30%;
+            top: 15%;
+            width: 30%;
+            height: 50%;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+        /* Animation Utilities */
+        .animate-enter { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .delay-100 { animation-delay: 100ms; }
+        .delay-200 { animation-delay: 200ms; }
     </style>
 </head>
-<body>
-    <div id="deployment-error">
-        <h1 style="font-size: 1.5rem; margin-bottom: 1rem;">Network Error</h1>
-        <p id="error-message" class="text-slate-400 mb-4"></p>
-        <button onclick="location.reload()" class="px-6 py-2 bg-indigo-600 text-white rounded-xl font-bold">Retry</button>
-    </div>
+<body class="h-screen flex flex-col overflow-hidden text-base">
 
-    <div id="app" v-cloak>
-        <!-- Landing Page -->
-        <div v-if="authState === 'landing'" class="min-h-screen flex flex-col items-center justify-center p-6 text-center animate-in">
-            <div class="mb-8">
-                <div class="relative w-20 h-20 bg-indigo-600 rounded-3xl flex items-center justify-center text-white shadow-2xl rotate-3 mx-auto">
-                    <i data-lucide="arrow-up-right" class="w-12 h-12"></i>
-                </div>
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-[100] flex flex-col gap-3 pointer-events-none"></div>
+
+    <!-- Top Navigation Bar -->
+    <nav class="h-20 bg-slate-900/80 backdrop-blur-xl border-b border-slate-800 z-50 flex items-center justify-between px-8 lg:px-12 shrink-0 shadow-lg">
+        <div class="flex items-center gap-4 group">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20 group-hover:shadow-cyan-500/40 transition-shadow">
+                <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
             </div>
-            <h1 class="text-5xl md:text-7xl font-black tracking-tighter mb-6 bg-gradient-to-r from-white to-slate-500 bg-clip-text text-transparent">Kaizen Finance</h1>
-            <p class="text-xl md:text-2xl text-slate-400 max-w-2xl mb-12 font-medium leading-relaxed">Continuous improvement for your financial future. Aggressively track and destroy your debts.</p>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl w-full mb-16 text-left">
-                <div v-for="feature in features" :key="feature.title" class="glass p-6 rounded-[2rem]">
-                    <div :class="feature.color" class="p-3 w-fit rounded-xl mb-4 text-white">
-                        <i :data-lucide="feature.icon"></i>
+            <div>
+                <h1 class="font-display text-2xl font-bold text-white tracking-tight">Absence Generator</h1>
+            </div>
+        </div>
+        
+        <div class="flex items-center gap-10 h-full">
+            <button id="nav-call-log" class="top-nav-item text-base tracking-wide active">Call Log</button>
+            <button id="nav-visit-request" class="top-nav-item text-base tracking-wide">Visit Request</button>
+            <button id="nav-visit-queue" class="top-nav-item text-base tracking-wide flex items-center gap-2">
+                Visit Queue
+                <span id="queue-badge" class="hidden bg-cyan-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-[0_0_10px_rgba(34,211,238,0.5)]">0</span>
+            </button>
+        </div>
+
+        <div class="w-10"></div> <!-- Spacer -->
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 overflow-hidden relative">
+        
+        <!-- Page 2: Call Log Generator -->
+        <div id="page-call-log" class="page absolute inset-0 overflow-y-auto p-6 md:p-8 lg:p-10 animate-enter">
+            <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-5 gap-8 h-full">
+                
+                <!-- LEFT: Command Deck -->
+                <div class="lg:col-span-3 flex flex-col gap-8 animate-enter delay-100">
+                    <!-- Top Bar: Call Type -->
+                    <div class="glass-panel p-2.5 rounded-3xl flex gap-3">
+                        <button id="btn-type-inbound" class="toggle-btn flex-1 py-5 rounded-2xl flex items-center justify-center gap-3 font-display font-bold text-base tracking-wide transition-all">
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.6)]"></span>
+                            INCOMING
+                        </button>
+                        <button id="btn-type-pd" class="toggle-btn flex-1 py-5 rounded-2xl flex items-center justify-center gap-3 font-display font-bold text-base tracking-wide active transition-all">
+                            <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-[0_0_10px_rgba(34,211,238,0.6)]"></span>
+                            PD CALL
+                        </button>
                     </div>
-                    <h3 class="font-bold mb-2 text-white">{{ feature.title }}</h3>
-                    <p class="text-sm text-slate-500 leading-relaxed">{{ feature.desc }}</p>
-                </div>
-            </div>
 
-            <div class="flex gap-4">
-                <button @click="authState = 'login'" class="bg-indigo-600 hover:bg-indigo-700 text-white px-10 py-5 rounded-[2rem] font-black text-xl flex items-center gap-3 transition-all hover:scale-105 active:scale-95">
-                    Login <i data-lucide="arrow-right"></i>
-                </button>
-                <button @click="authState = 'register'" class="bg-slate-800 hover:bg-slate-700 text-white px-10 py-5 rounded-[2rem] font-black text-xl flex items-center gap-3 transition-all hover:scale-105 active:scale-95">
-                    Sign Up
-                </button>
+                    <!-- Main Controls -->
+                    <div class="glass-panel p-8 rounded-3xl flex-1 flex flex-col min-h-0">
+                        
+                        <!-- Caller Identity Section -->
+                        <div class="mb-8 border-b border-white/5 pb-6">
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-3">
+                                <span class="w-1.5 h-5 bg-indigo-500 rounded-full"></span>
+                                Caller Identity
+                            </label>
+                            
+                            <div class="flex gap-2 mb-4 bg-slate-900/50 p-1.5 rounded-xl border border-white/5">
+                                <button id="caller-dw" class="flex-1 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wide bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 shadow-[0_0_15px_rgba(99,102,241,0.2)] transition-all">DW</button>
+                                <button id="caller-rel" class="flex-1 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wide text-slate-400 hover:text-slate-300 hover:bg-slate-800 transition-all border border-transparent">Others</button>
+                                <button id="caller-pol" class="flex-1 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wide text-slate-400 hover:text-slate-300 hover:bg-slate-800 transition-all border border-transparent">Police</button>
+                            </div>
+
+                            <!-- Dynamic Inputs (Hidden by default) -->
+                            <div id="caller-inputs-rel" class="hidden animate-enter">
+                                <input type="text" id="cl-rel-relation" class="input-field w-full rounded-xl p-3 font-mono text-sm" placeholder="Relationship or Person (e.g. Mother, Friend, Partner)">
+                            </div>
+                            
+                            <div id="caller-inputs-pol" class="hidden animate-enter grid grid-cols-2 gap-3">
+                                <input type="text" id="cl-pol-name" class="input-field w-full rounded-xl p-3 font-mono text-sm col-span-2" placeholder="Officer Name (e.g. PC Smith)">
+                                <input type="text" id="cl-pol-badge" class="input-field w-full rounded-xl p-3 font-mono text-sm" placeholder="Badge Number">
+                                <input type="text" id="cl-pol-station" class="input-field w-full rounded-xl p-3 font-mono text-sm" placeholder="Police Station">
+                                <div class="col-span-2 flex items-center justify-between p-3.5 rounded-xl bg-slate-800/40 border border-white/5 mt-1 cursor-pointer hover:bg-slate-800 transition-colors" onclick="document.getElementById('cl-pol-pass').click()">
+                                    <span class="text-xs font-bold text-slate-300 uppercase select-none">Password Confirmed on phone?</span>
+                                    <input type="checkbox" id="cl-pol-pass" class="custom-checkbox w-5 h-5 pointer-events-none">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="scenario-container" class="animate-enter">
+                            <div class="flex justify-between items-end mb-6">
+                                <label class="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-3">
+                                    <span class="w-1.5 h-5 bg-cyan-500 rounded-full"></span>
+                                    Select Scenario
+                                </label>
+                                <span class="text-xs text-slate-500 font-mono flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                    Live Update Active
+                                </span>
+                            </div>
+                            
+                            <!-- Scenario Grid -->
+                            <div id="scenario-buttons" class="grid grid-cols-2 gap-4 overflow-y-auto custom-scrollbar pr-2 pb-6">
+                                <!-- Injected via JS -->
+                            </div>
+
+                            <!-- Violation Sub-option (Hidden by default) -->
+                            <div id="violation-container" class="hidden pt-2 pb-4 border-t border-white/5 animate-enter">
+                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-3">
+                                    <span class="w-1.5 h-5 bg-purple-500 rounded-full"></span>
+                                    Is this a violation?
+                                </label>
+                                <div class="flex gap-2 bg-slate-900/50 p-1.5 rounded-xl border border-white/5">
+                                    <button id="btn-viol-denied" class="flex-1 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wide bg-purple-500/20 text-purple-400 border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.2)] transition-all">No (Denied)</button>
+                                    <button id="btn-viol-admitted" class="flex-1 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wide text-slate-400 hover:text-slate-300 hover:bg-slate-800 transition-all border border-transparent">Yes (Violation)</button>
+                                </div>
+                            </div>
+
+                            <!-- Resolution Sub-option (Hidden by default) -->
+                            <div id="resolution-container" class="hidden pt-2 pb-4 border-t border-white/5 animate-enter">
+                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-3">
+                                    <span class="w-1.5 h-5 bg-orange-500 rounded-full"></span>
+                                    Resolution Status
+                                </label>
+                                <div class="flex gap-2 bg-slate-900/50 p-1.5 rounded-xl border border-white/5">
+                                    <button id="btn-res-resolved" class="flex-1 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wide bg-orange-500/20 text-orange-400 border border-orange-500/30 shadow-[0_0_15px_rgba(249,115,22,0.2)] transition-all">Resolved</button>
+                                    <button id="btn-res-unresolved" class="flex-1 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wide text-slate-400 hover:text-slate-300 hover:bg-slate-800 transition-all border border-transparent">Unresolved</button>
+                                </div>
+                            </div>
+
+                            <!-- Hospital Sub-option (Hidden by default) -->
+                            <div id="hospital-container" class="hidden pt-2 pb-4 border-t border-white/5 animate-enter">
+                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-3">
+                                    <span class="w-1.5 h-5 bg-rose-500 rounded-full"></span>
+                                    Hospital Details
+                                </label>
+                                <input type="text" id="cl-hosp-name" class="input-field w-full rounded-xl p-3 font-mono text-sm" placeholder="Name of Hospital (Optional)">
+                            </div>
+
+                            <!-- Visit Enquiry Sub-option (Hidden by default) -->
+                            <div id="visit-enq-container" class="hidden pt-2 pb-4 border-t border-white/5 animate-enter">
+                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-3">
+                                    <span class="w-1.5 h-5 bg-amber-500 rounded-full"></span>
+                                    Enquiry Type
+                                </label>
+                                <div class="flex gap-2 mb-4 bg-slate-900/50 p-1.5 rounded-xl border border-white/5">
+                                    <button id="btn-ve-pending" class="flex-1 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wide bg-amber-500/20 text-amber-400 border border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.2)] transition-all">Pending</button>
+                                    <button id="btn-ve-missed" class="flex-1 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wide text-slate-400 hover:text-slate-300 hover:bg-slate-800 transition-all border border-transparent">Missed</button>
+                                    <button id="btn-ve-new" class="flex-1 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wide text-slate-400 hover:text-slate-300 hover:bg-slate-800 transition-all border border-transparent">Request New</button>
+                                </div>
+                                
+                                <div id="ve-new-inputs" class="hidden animate-enter grid grid-cols-2 gap-3 mt-3">
+                                    <input type="text" id="ve-new-name" class="input-field w-full rounded-xl p-3 font-mono text-sm" placeholder="DW Name">
+                                    <input type="text" id="ve-new-id" class="input-field w-full rounded-xl p-3 font-mono text-sm" placeholder="Order ID">
+                                    <input type="text" id="ve-new-reason" class="input-field w-full rounded-xl p-3 font-mono text-sm col-span-2" placeholder="Reason for Visit">
+                                    <button id="ve-add-btn" class="col-span-2 btn-action h-11 rounded-xl text-xs font-bold uppercase tracking-wide text-white mt-1 shadow-lg flex items-center justify-center gap-2">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                                        Add to Visit Queue
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Details Input -->
+                        <div class="mt-4 pt-6 border-t border-white/5">
+                            <div class="flex items-center justify-between mb-4">
+                                <label class="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-3">
+                                    <span class="w-1.5 h-5 bg-sky-500 rounded-full"></span>
+                                    Additional Context
+                                </label>
+                                <button id="btn-reset-call" class="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 border border-rose-500/30 rounded-xl px-4 py-2 flex items-center gap-2 transition-all group" title="Clear form for new call">
+                                    <svg class="w-4 h-4 group-hover:-rotate-180 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                                    <span class="text-[10px] font-bold uppercase tracking-widest">Reset Form</span>
+                                </button>
+                            </div>
+                            <textarea id="call-log-custom-details" class="input-field w-full h-28 rounded-2xl p-5 font-mono text-sm leading-relaxed" placeholder="Type details here to update log instantly..."></textarea>
+                        </div>
+
+                        <!-- Visit Required Section -->
+                        <div class="mt-4 pt-6 border-t border-white/5">
+                            <div class="flex items-center justify-between mb-4">
+                                <label class="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-3">
+                                    <span class="w-1.5 h-5 bg-rose-500 rounded-full"></span>
+                                    Visit Required?
+                                </label>
+                                <div class="flex items-center gap-3 px-3 py-1.5 rounded-full bg-slate-800/50 border border-white/5 cursor-pointer hover:bg-slate-800 transition-colors" onclick="document.getElementById('cl-visit-required').click()">
+                                    <span class="text-[11px] font-bold text-slate-300 uppercase select-none">Yes, Request Visit</span>
+                                    <input type="checkbox" id="cl-visit-required" class="custom-checkbox w-4 h-4 pointer-events-none">
+                                </div>
+                            </div>
+                            
+                            <div id="cl-visit-inputs" class="hidden animate-enter grid grid-cols-2 gap-3">
+                                <input type="text" id="cl-visit-name" class="input-field w-full rounded-xl p-3 font-mono text-sm" placeholder="Subject Name">
+                                <input type="text" id="cl-visit-id" class="input-field w-full rounded-xl p-3 font-mono text-sm" placeholder="Order ID (Optional)">
+                                <input type="text" id="cl-visit-reason" class="input-field w-full rounded-xl p-3 font-mono text-sm col-span-2" placeholder="Reason for Visit">
+                                <button id="cl-visit-btn" class="col-span-2 btn-action h-11 rounded-xl text-xs font-bold uppercase tracking-wide text-white mt-1 shadow-lg">Add to Visit Queue</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT: Data Stream -->
+                <div class="lg:col-span-2 flex flex-col h-full gap-8 animate-enter delay-200">
+                    <div class="glass-panel p-8 rounded-3xl flex-1 flex flex-col bg-slate-900/80 border-t-4 border-cyan-500/50 shadow-cyan-500/10">
+                        <!-- Title Output -->
+                        <div class="mb-10">
+                            <div class="flex justify-between items-center mb-4">
+                                <label class="text-xs font-bold text-cyan-400 uppercase tracking-widest">Log Title</label>
+                                <button id="copy-title-btn" class="btn-copy h-9 px-4 rounded-lg text-xs font-bold uppercase tracking-wide gap-2">
+                                    Copy Title
+                                </button>
+                            </div>
+                            <input type="text" id="call-title-output" class="input-field w-full rounded-2xl p-4 font-mono text-sm text-white bg-slate-950 border-slate-800 transition-colors focus:border-cyan-500" placeholder="Type or generate title...">
+                        </div>
+
+                        <!-- Body Output -->
+                        <div class="flex-1 flex flex-col min-h-0">
+                            <div class="flex justify-between items-center mb-4">
+                                <label class="text-xs font-bold text-cyan-400 uppercase tracking-widest">Log Contents</label>
+                                <button id="copy-log-btn" class="btn-copy h-10 px-5 rounded-xl text-sm font-bold uppercase tracking-wide gap-2 shadow-[0_0_20px_rgba(56,189,248,0.2)]">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 01-2-2V5"></path></svg>
+                                    Copy Log
+                                </button>
+                            </div>
+                            <textarea id="log-output" class="input-field w-full flex-1 rounded-2xl p-5 font-mono text-sm leading-relaxed resize-none bg-slate-950 border-slate-800 text-slate-300" placeholder="// Log will be generated here automatically..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
 
-        <!-- Auth Pages -->
-        <div v-if="authState === 'login' || authState === 'register'" class="min-h-screen flex items-center justify-center p-6 animate-in text-left">
-            <div class="w-full max-w-md glass p-10 rounded-[2.5rem] shadow-2xl">
-                <div class="flex flex-col items-center mb-10 text-center">
-                    <h2 class="text-3xl font-black text-white tracking-tighter">{{ authState === 'login' ? 'Welcome Back' : 'Join Kaizen' }}</h2>
-                    <p class="text-slate-500 text-sm mt-1">One percent better every day.</p>
+        <!-- Page 3: Visit Request -->
+        <div id="page-visit-request" class="page absolute inset-0 overflow-y-auto p-6 md:p-8 lg:p-10 animate-enter hidden">
+            <div class="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="glass-panel rounded-3xl p-8 animate-enter delay-100">
+                    <h2 class="text-2xl font-display font-bold text-white mb-8">Visit Request</h2>
+                    
+                    <div class="mb-6">
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Equipment Type</label>
+                        <div class="grid grid-cols-2 gap-4">
+                            <button id="vr-equip-rf" data-equip="RF" class="scenario-btn w-full py-4 rounded-xl font-bold text-slate-300 text-sm">RF Unit</button>
+                            <button id="vr-equip-gps" data-equip="GPS" class="scenario-btn w-full py-4 rounded-xl font-bold text-slate-300 text-sm">GPS Tag</button>
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Subject Age Group</label>
+                        <div class="grid grid-cols-2 gap-4">
+                            <button id="vr-age-adult" data-age="Adult" class="scenario-btn w-full py-4 rounded-xl font-bold text-slate-300 text-sm selected">Adult</button>
+                            <button id="vr-age-child" data-age="Child" class="scenario-btn w-full py-4 rounded-xl font-bold text-slate-300 text-sm">Child</button>
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <div class="flex justify-between items-center mb-3">
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest">Curfew Settings</label>
+                            <div id="vr-no-curfew-container" class="flex items-center gap-3 px-3 py-1.5 rounded-full bg-slate-800/50 border border-white/5 cursor-pointer hover:bg-slate-800 transition-colors">
+                                <input type="checkbox" id="vr-no-curfew" class="w-3.5 h-3.5 rounded border-slate-600 bg-slate-700 text-cyan-500 focus:ring-cyan-500 cursor-pointer">
+                                <label for="vr-no-curfew" class="text-[11px] font-bold text-slate-300 select-none uppercase cursor-pointer">No Curfew</label>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <input type="time" id="vr-curfew-start" value="19:00" class="input-field w-full rounded-xl p-3 font-mono text-sm">
+                            <input type="time" id="vr-curfew-end" value="07:00" class="input-field w-full rounded-xl p-3 font-mono text-sm">
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Reason for Visit</label>
+                        <div id="vr-scenario-buttons" class="grid grid-cols-2 gap-3 h-48 overflow-y-auto custom-scrollbar pr-2">
+                            <!-- JS Injected -->
+                        </div>
+                    </div>
+
+                    <textarea id="vr-custom-details" class="input-field w-full h-24 rounded-xl p-4 mb-6 text-sm font-mono" placeholder="Additional notes for field officer..."></textarea>
+                    
+                    <button id="vr-generate-log-btn" class="w-full btn-action text-white font-bold py-4 rounded-xl shadow-lg uppercase tracking-wide text-sm">Generate Visit Log</button>
                 </div>
 
-                <form @submit.prevent="handleAuth" class="space-y-4">
-                    <div v-if="authState === 'register'">
-                        <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-1">Full Name</label>
-                        <div class="relative">
-                            <i data-lucide="user" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 w-4 h-4"></i>
-                            <input v-model="authData.name" type="text" required class="w-full bg-slate-900 border border-slate-700 rounded-2xl py-3.5 pl-12 pr-4 text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
+                <div class="glass-panel rounded-3xl p-8 bg-slate-900/60 flex flex-col animate-enter delay-200">
+                    <div class="mb-8">
+                        <div class="flex justify-between items-center mb-3">
+                            <label class="text-xs font-bold text-slate-400 uppercase tracking-widest">Title Output</label>
+                            <button id="vr-copy-title-btn" class="btn-copy h-8 px-3 rounded-lg text-xs font-bold uppercase">Copy</button>
                         </div>
+                        <input type="text" id="vr-title-output" class="input-field w-full rounded-xl p-3 font-mono text-xs bg-slate-950" readonly placeholder="AVR DW, MBD - [Date], SR10...">
                     </div>
-                    <div>
-                        <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-1">Email</label>
-                        <div class="relative">
-                            <i data-lucide="mail" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 w-4 h-4"></i>
-                            <input v-model="authData.email" type="email" required class="w-full bg-slate-900 border border-slate-700 rounded-2xl py-3.5 pl-12 pr-4 text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
-                        </div>
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-1">Password</label>
-                        <div class="relative">
-                            <i data-lucide="lock" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 w-4 h-4"></i>
-                            <input v-model="authData.password" :type="showPassword ? 'text' : 'password'" required class="w-full bg-slate-900 border border-slate-700 rounded-2xl py-3.5 pl-12 pr-12 text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
-                            <button type="button" @click="showPassword = !showPassword" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white">
-                                <i :data-lucide="showPassword ? 'eye-off' : 'eye'" class="w-4 h-4"></i>
+                    <div class="flex-1 flex flex-col">
+                        <div class="flex justify-between items-center mb-3">
+                            <label class="text-xs font-bold text-slate-400 uppercase tracking-widest">Log Body</label>
+                            <button id="vr-copy-log-btn" class="btn-copy h-9 px-4 rounded-xl text-xs font-bold uppercase tracking-wide gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 01-2-2V5"></path></svg>
+                                Copy Log
                             </button>
                         </div>
-                    </div>
-                    <button type="submit" :disabled="isLoadingAuth" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-4.5 rounded-2xl font-black text-lg shadow-xl active:scale-95 transition-all mt-4 disabled:opacity-50">
-                        <span v-if="isLoadingAuth" class="flex items-center justify-center gap-2 animate-pulse">Processing...</span>
-                        <span v-else>{{ authState === 'login' ? 'Sign In' : 'Create Account' }}</span>
-                    </button>
-                </form>
-                
-                <p class="text-center mt-8 text-slate-500 text-sm">
-                    {{ authState === 'login' ? "New here?" : "Joined already?" }}
-                    <button @click="authState = authState === 'login' ? 'register' : 'login'" class="text-indigo-400 font-bold hover:underline">
-                        {{ authState === 'login' ? 'Create Account' : 'Login' }}
-                    </button>
-                </p>
-            </div>
-        </div>
-
-        <!-- Dashboard Layout -->
-        <div v-if="authState === 'dashboard'" class="min-h-screen flex flex-col lg:flex-row text-left">
-            <!-- Sidebar -->
-            <aside class="w-full lg:w-80 bg-slate-900 border-r border-slate-800 flex flex-col h-screen overflow-y-auto custom-scrollbar shrink-0">
-                <div class="p-8 flex items-center gap-3">
-                    <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white"><i data-lucide="arrow-up-right"></i></div>
-                    <div class="text-left">
-                        <span class="text-xl font-black tracking-tighter block leading-tight text-white">Kaizen</span>
-                        <span class="text-[10px] text-indigo-400 font-black uppercase tracking-widest block">Continuous Growth</span>
-                    </div>
-                </div>
-
-                <nav class="flex-1 px-6 space-y-1 mt-4">
-                    <p class="px-4 text-[10px] font-black text-slate-600 uppercase tracking-widest mb-4">Main Navigation</p>
-                    <button v-for="item in navItems" :key="item.id" @click="currentPage = item.id" :class="currentPage === item.id ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:bg-slate-800'" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-all">
-                        <i :data-lucide="item.icon" class="w-5 h-5"></i>
-                        <span>{{ item.label }}</span>
-                    </button>
-                    <div class="h-px bg-slate-800 my-4 mx-4"></div>
-                    <p class="px-4 text-[10px] font-black text-slate-600 uppercase tracking-widest mb-4">Debt Categories</p>
-                    <button v-for="cat in categories" :key="cat.id" @click="currentPage = cat.id" :class="currentPage === cat.id ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:bg-slate-800'" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-all">
-                        <i :data-lucide="cat.icon" class="w-5 h-5"></i>
-                        <span>{{ cat.label }}</span>
-                    </button>
-                </nav>
-
-                <div class="p-6 mt-auto border-t border-slate-800 bg-slate-900/50">
-                    <div class="flex items-center gap-4 p-4 glass rounded-2xl">
-                        <div class="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center font-black text-white capitalize shadow-lg">{{ userName?.[0] }}</div>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-sm font-black text-white truncate">{{ userName }}</p>
-                            <p class="text-[10px] text-emerald-500 font-bold uppercase">Destroyer</p>
-                        </div>
-                        <button @click="handleLogout" class="text-slate-500 hover:text-rose-400"><i data-lucide="log-out"></i></button>
-                    </div>
-                </div>
-            </aside>
-
-            <!-- Main Content Area -->
-            <main class="flex-1 h-screen overflow-y-auto custom-scrollbar p-6 md:p-12 lg:p-16 max-w-[1400px] w-full mx-auto">
-                
-                <!-- Overview View -->
-                <div v-if="currentPage === 'dashboard'" class="space-y-8">
-                    <!-- Progress Card -->
-                    <div class="glass p-8 md:p-12 rounded-[2.5rem] relative overflow-hidden shadow-2xl">
-                        <div class="flex justify-between items-center mb-10">
-                            <div class="text-left text-white">
-                                <h2 class="text-2xl font-black flex items-center gap-3"><i data-lucide="trophy" class="text-amber-500"></i> Journey to Freedom</h2>
-                                <p class="text-slate-400 text-sm mt-1">Consistency compounds.</p>
-                            </div>
-                            <span class="text-5xl font-black text-indigo-500">{{ progressPercent }}%</span>
-                        </div>
-                        <div class="h-4 w-full bg-slate-900 rounded-full overflow-hidden p-1 border border-slate-800">
-                            <div class="h-full bg-gradient-to-r from-indigo-600 to-emerald-500 rounded-full transition-all duration-1000 shadow-[0_0_20px_#6366f1]" :style="{ width: progressPercent + '%' }"></div>
-                        </div>
-                        <div class="flex justify-between mt-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">
-                            <span>Start</span>
-                            <span :class="progressPercent >= 70 ? 'text-emerald-400' : ''">Home Stretch (70%)</span>
-                            <span>Freedom</span>
-                        </div>
-                    </div>
-
-                    <!-- Terminology Stats -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div class="glass p-8 rounded-[2rem] text-left">
-                            <div class="bg-rose-500/20 text-rose-500 p-3 rounded-2xl w-fit mb-4"><i data-lucide="trending-down"></i></div>
-                            <h3 class="text-slate-500 text-[10px] font-black uppercase tracking-widest">Total debt</h3>
-                            <p class="text-3xl font-black text-white mt-1">£{{ totalBalance.toLocaleString() }}</p>
-                        </div>
-                        <div class="glass p-8 rounded-[2rem] text-left">
-                            <div class="bg-amber-500/20 text-amber-500 p-3 rounded-2xl w-fit mb-4"><i data-lucide="calendar"></i></div>
-                            <h3 class="text-slate-500 text-[10px] font-black uppercase tracking-widest">Minimum payments</h3>
-                            <p class="text-3xl font-black text-white mt-1">£{{ totalMinPayment.toLocaleString() }}</p>
-                        </div>
-                        <div class="glass p-8 rounded-[2rem] text-left">
-                            <div class="bg-indigo-500/20 text-indigo-500 p-3 rounded-2xl w-fit mb-4"><i data-lucide="zap"></i></div>
-                            <h3 class="text-slate-500 text-[10px] font-black uppercase tracking-widest">total payments</h3>
-                            <p class="text-3xl font-black text-white mt-1">£{{ (totalMinPayment + extraPayment).toLocaleString() }}</p>
-                        </div>
-                    </div>
-
-                    <!-- Category List -->
-                    <div class="glass p-10 rounded-[2.5rem]">
-                        <h2 class="text-2xl font-black text-white mb-8">Repayment Streams</h2>
-                        <div class="space-y-4">
-                            <div v-for="cat in categorySummaries" :key="cat.name" @click="currentPage = cat.id" class="flex items-center justify-between p-6 rounded-2xl hover:bg-slate-800 transition-all cursor-pointer group">
-                                <div class="flex items-center gap-4">
-                                    <div :class="cat.color" class="p-3 rounded-xl text-white shadow-lg"><i :data-lucide="cat.icon"></i></div>
-                                    <div class="text-left">
-                                        <p class="font-black text-white text-lg">{{ cat.name }}s</p>
-                                        <p class="text-xs text-slate-500 uppercase tracking-widest">£{{ cat.paid.toLocaleString() }} Repaid</p>
-                                    </div>
-                                </div>
-                                <div class="text-right">
-                                    <p class="text-xl font-black text-white">£{{ cat.balance.toLocaleString() }}</p>
-                                    <div class="flex items-center gap-2 mt-1 justify-end">
-                                        <div class="w-16 h-1.5 bg-slate-900 rounded-full overflow-hidden">
-                                            <div :class="cat.color" class="h-full" :style="{ width: cat.pct + '%' }"></div>
-                                        </div>
-                                        <span class="text-[10px] font-black text-indigo-400">{{ Math.round(cat.pct) }}%</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Academy View -->
-                <div v-if="currentPage === 'info'" class="animate-in space-y-12 max-w-4xl mx-auto">
-                    <h2 class="text-5xl font-black text-white tracking-tighter">Academy</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
-                        <div class="glass p-10 rounded-[3rem] border-l-4 border-indigo-500">
-                            <h3 class="text-2xl font-black text-white mb-4">Compound Aggression</h3>
-                            <p class="text-slate-400 leading-relaxed">Debt grows with interest. Freedom grows with consistency. Every £1 you pay above the minimum is a punch to the face of your debt.</p>
-                        </div>
-                        <div class="glass p-10 rounded-[3rem] border-l-4 border-emerald-500">
-                            <h3 class="text-2xl font-black text-white mb-4">Small Wins Matter</h3>
-                            <p class="text-slate-400 leading-relaxed">Don't look at the mountain. Look at the next step. Clearing your smallest category gives your brain the dopamine needed for the big battles.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Category Manager View -->
-                <div v-if="isCategoryPage" class="animate-in space-y-10">
-                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
-                        <div class="flex items-center gap-6">
-                            <div :class="activeCategoryMeta.color" class="p-5 rounded-2xl text-white shadow-2xl rotate-2"><i :data-lucide="activeCategoryMeta.icon" class="w-10 h-10"></i></div>
-                            <div class="text-left">
-                                <h2 class="text-4xl font-black text-white tracking-tighter">{{ activeCategoryMeta.name }}</h2>
-                                <p class="text-slate-500 font-medium">Outstanding: <span class="text-white font-black">£{{ activeCategoryTotal.toLocaleString() }}</span></p>
-                            </div>
-                        </div>
-                        <button @click="addNewEntry" class="bg-indigo-600 hover:bg-indigo-500 text-white px-8 py-4 rounded-2xl font-black shadow-xl transition-all active:scale-95">Add Entry</button>
-                    </div>
-
-                    <div class="space-y-4">
-                        <div v-if="filteredDebts.length === 0" class="glass border-2 border-dashed border-slate-700/50 py-24 rounded-[3rem] flex flex-col items-center gap-4 opacity-50">
-                            <i data-lucide="target" class="w-12 h-12"></i>
-                            <p class="font-black uppercase tracking-widest text-xs">Section Clear</p>
-                        </div>
-                        <div v-for="debt in filteredDebts" :key="debt.id" class="glass p-8 rounded-[2.5rem] flex flex-col md:flex-row items-center gap-10 border-l-[6px]" :style="{ borderLeftColor: activeCategoryMeta.hex }">
-                            <div class="flex-1 w-full text-left">
-                                <div class="flex items-center gap-4 mb-6">
-                                    <input v-model="debt.name" @change="updateDebt(debt.id, 'name', debt.name)" class="text-2xl font-black bg-transparent border-b-2 border-transparent focus:border-indigo-500 transition-all outline-none text-white w-full" placeholder="Label...">
-                                    <button @click="openHistory(debt)" class="p-3 bg-slate-800 hover:bg-slate-700 rounded-xl text-indigo-400 font-bold text-xs uppercase tracking-widest flex items-center gap-2"><i data-lucide="history" class="w-4 h-4"></i> <span>Log</span></button>
-                                </div>
-                                <div class="flex flex-wrap gap-4">
-                                    <div class="bg-slate-900/50 px-4 py-2 rounded-xl flex items-center gap-2 border border-slate-800">
-                                        <span class="text-[10px] font-black text-slate-500 uppercase">APR:</span>
-                                        <input type="number" v-model.number="debt.interest" @change="updateDebt(debt.id, 'interest', debt.interest)" class="w-12 bg-transparent text-white font-bold outline-none text-sm">%
-                                    </div>
-                                    <div class="bg-slate-900/50 px-4 py-2 rounded-xl flex items-center gap-2 border border-slate-800">
-                                        <span class="text-[10px] font-black text-slate-500 uppercase">Min: £</span>
-                                        <input type="number" v-model.number="debt.min_payment" @change="updateDebt(debt.id, 'min_payment', debt.min_payment)" class="w-16 bg-transparent text-white font-bold outline-none text-sm">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="flex items-center gap-8 w-full md:w-auto">
-                                <div class="text-right">
-                                    <p class="text-[10px] font-black text-slate-600 uppercase tracking-widest mb-1">Value Owed</p>
-                                    <div class="flex items-center bg-slate-900 px-6 py-4 rounded-3xl border border-white/5">
-                                        <span class="text-2xl font-black text-slate-500 leading-none">£</span>
-                                        <input type="number" v-model.number="debt.balance" @change="updateDebt(debt.id, 'balance', debt.balance)" class="text-3xl font-black text-white bg-transparent w-32 text-right outline-none">
-                                    </div>
-                                </div>
-                                <button @click="deleteDebt(debt.id)" class="p-5 hover:bg-rose-500/10 text-slate-600 hover:text-rose-500 rounded-2xl transition-all"><i data-lucide="trash-2"></i></button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </main>
-        </div>
-
-        <!-- History / Injection Modal -->
-        <div v-if="activeDebt" class="fixed inset-0 z-[100] flex items-center justify-end bg-slate-950/90 backdrop-blur-xl animate-in">
-            <div class="w-full max-w-md h-full bg-slate-900 border-l border-white/5 p-10 flex flex-col shadow-2xl">
-                <div class="flex justify-between items-center mb-12">
-                    <div class="text-left">
-                        <h3 class="text-3xl font-black text-white tracking-tighter">Log Injection</h3>
-                        <p class="text-slate-500 text-sm font-bold uppercase tracking-widest">{{ activeDebt.name }}</p>
-                    </div>
-                    <button @click="activeDebt = null" class="p-3 bg-slate-800 rounded-2xl text-slate-400 hover:text-white transition-all"><i data-lucide="x"></i></button>
-                </div>
-                <form @submit.prevent="submitPayment" class="p-8 glass rounded-[2.5rem] mb-10 text-left">
-                    <div class="space-y-6">
-                        <div class="bg-slate-950 p-5 rounded-2xl border border-white/5">
-                            <span class="text-slate-500 font-black mr-2">£</span>
-                            <input v-model.number="payAmount" type="number" step="0.01" required placeholder="0.00" class="w-full bg-transparent text-4xl font-black text-white outline-none">
-                        </div>
-                        <input v-model="payDate" type="date" required class="w-full bg-slate-950 p-4 rounded-2xl border border-white/5 text-white font-bold [color-scheme:dark]">
-                        <button type="submit" class="w-full bg-indigo-600 py-6 rounded-3xl font-black text-lg shadow-2xl shadow-indigo-900/50 hover:bg-indigo-500 transition-all text-white uppercase tracking-widest">Execute</button>
-                    </div>
-                </form>
-                <div class="flex-1 overflow-y-auto custom-scrollbar">
-                    <div class="space-y-4">
-                        <div v-for="pay in sortedPayments" :key="pay.id" class="flex justify-between p-5 glass rounded-2xl items-center text-left">
-                            <div class="flex items-center gap-3">
-                                <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-                                <div>
-                                    <p class="text-white font-black">£{{ pay.amount.toLocaleString() }}</p>
-                                    <p class="text-[10px] text-slate-500 font-bold uppercase">{{ pay.date }}</p>
-                                </div>
-                            </div>
-                            <span class="text-[10px] font-black text-emerald-500 uppercase bg-emerald-500/10 px-3 py-1 rounded-full">Crushed</span>
-                        </div>
+                        <textarea id="vr-log-output" class="input-field w-full flex-1 rounded-xl p-4 font-mono text-sm leading-relaxed resize-none bg-slate-950 text-slate-300" placeholder="Generated log will appear here..."></textarea>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Notification Toast -->
-        <div v-if="notification" class="fixed bottom-10 right-10 z-[110] bg-indigo-600 text-white px-8 py-5 rounded-full shadow-2xl flex items-center gap-4 animate-in border border-white/20">
-            <i data-lucide="zap"></i>
-            <span class="font-black text-base tracking-tight uppercase italic">{{ notification }}</span>
+        <!-- Page 4: Visit Queue -->
+        <div id="page-visit-queue" class="page absolute inset-0 overflow-y-auto p-6 md:p-8 lg:p-10 animate-enter hidden">
+            <div class="max-w-6xl mx-auto flex flex-col gap-8 h-full">
+                
+                <div class="flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                        <div class="w-3 h-3 rounded-full bg-cyan-400 shadow-[0_0_10px_rgba(34,211,238,0.8)]"></div>
+                        <h2 class="text-2xl font-display font-bold text-white tracking-wide">Visit Request Queue</h2>
+                    </div>
+                    
+                    <button id="vq-clear-btn" class="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 font-bold py-2.5 px-5 rounded-xl border border-rose-500/30 transition-colors uppercase tracking-wide text-xs flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        Clear Queue
+                    </button>
+                </div>
+
+                <!-- Input Section -->
+                <div class="glass-panel p-6 rounded-3xl animate-enter delay-100 shrink-0 border-t-2 border-slate-700/50">
+                    <div class="grid grid-cols-1 md:grid-cols-[1fr_1fr_1fr_auto] gap-4 items-end">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Subject Name</label>
+                            <input type="text" id="vq-name" class="input-field w-full rounded-xl p-4 font-mono text-sm" placeholder="e.g. John Doe">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Order ID (Optional)</label>
+                            <input type="text" id="vq-order-id" class="input-field w-full rounded-xl p-4 font-mono text-sm" placeholder="e.g. 10293847">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Reason for Visit</label>
+                            <input type="text" id="vq-reason" class="input-field w-full rounded-xl p-4 font-mono text-sm" placeholder="e.g. Equipment Tamper">
+                        </div>
+                        <button id="vq-add-btn" class="btn-action text-white font-bold h-[54px] px-8 rounded-xl shadow-lg uppercase tracking-wide text-sm whitespace-nowrap">
+                            Add to Queue
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Table Section -->
+                <div class="glass-panel rounded-3xl flex-1 flex flex-col min-h-[400px] animate-enter delay-200 overflow-hidden border-t-2 border-slate-700/50">
+                    <!-- Table Header -->
+                    <div class="grid grid-cols-[80px_1fr_1fr_1.5fr_80px] gap-4 px-6 py-4 border-b border-white/10 bg-slate-900/50">
+                        <div class="text-xs font-bold text-slate-400 uppercase tracking-widest text-center">Status</div>
+                        <div class="text-xs font-bold text-slate-400 uppercase tracking-widest">Subject Name</div>
+                        <div class="text-xs font-bold text-slate-400 uppercase tracking-widest">Order ID</div>
+                        <div class="text-xs font-bold text-slate-400 uppercase tracking-widest">Reason</div>
+                        <div class="text-xs font-bold text-slate-400 uppercase tracking-widest text-center">Actions</div>
+                    </div>
+                    
+                    <!-- Table Body -->
+                    <div id="vq-list" class="flex-1 overflow-y-auto custom-scrollbar p-2">
+                        <!-- Items injected here -->
+                    </div>
+                </div>
+
+            </div>
         </div>
-    </div>
+
+    </main>
 
     <script type="module">
-        const { createApp, ref, computed, onMounted, watch } = Vue;
-
-        const SUPABASE_URL = 'https://clstohryamyzfwfymrrr.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNsc3RvaHJ5YW15emZ3dGZ5bXJyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAxMTI0NjgsImV4cCI6MjA4NTY4ODQ2OH0.NIef4prO_6ei9GCl2fUGgL-wEZkCdToiqfa215oic5s';
-        
-        // Ensure supabase is loaded from CDN global before initializing
-        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        createApp({
-            setup() {
-                const authState = ref('landing');
-                const user = ref(null);
-                const userName = ref('Warrior');
-                const isLoading = ref(true);
-                const isLoadingAuth = ref(false);
-                const currentPage = ref('dashboard');
-                const notification = ref(null);
-                const debts = ref([]);
-                const extraPayment = ref(200);
-                const strategy = ref('snowball');
-                const showPassword = ref(false);
+        document.addEventListener('DOMContentLoaded', async () => {
+            // --- Custom Toast Notification ---
+            function showToast(message, type = 'error') {
+                const container = document.getElementById('toast-container');
+                const toast = document.createElement('div');
+                const bgColor = type === 'error' ? 'bg-rose-500/90 border-rose-500/50' : (type === 'warning' ? 'bg-amber-500/90 border-amber-500/50' : 'bg-emerald-500/90 border-emerald-500/50');
                 
-                const authData = ref({ email: '', password: '', name: '' });
-                const activeDebt = ref(null);
-                const payAmount = ref(null);
-                const payDate = ref(new Date().toISOString().split('T')[0]);
+                toast.className = `px-6 py-4 rounded-xl text-white font-bold text-sm shadow-[0_10px_40px_rgba(0,0,0,0.5)] border backdrop-blur-md transform transition-all duration-300 translate-y-10 opacity-0 ${bgColor} flex items-center gap-3`;
+                
+                let icon = '';
+                if(type === 'error') icon = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
+                else if(type === 'warning') icon = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>';
+                else icon = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>';
+                
+                toast.innerHTML = `${icon}<span>${message}</span>`;
+                container.appendChild(toast);
 
-                const navItems = [
-                    { id: 'dashboard', label: 'Overview', icon: 'layout-dashboard' },
-                    { id: 'info', label: 'Academy', icon: 'graduation-cap' },
-                ];
-
-                const categories = [
-                    { id: 'credit-cards', label: 'Credit Cards', icon: 'credit-card', key: 'Credit Card', color: 'bg-blue-600', hex: '#2563eb' },
-                    { id: 'education', label: 'School Fees', icon: 'book-open', key: 'Education', color: 'bg-emerald-600', hex: '#059669' },
-                    { id: 'personal', label: 'Personal Debts', icon: 'user', key: 'Personal', color: 'bg-purple-600', hex: '#9333ea' },
-                    { id: 'subscriptions', label: 'Subscriptions', icon: 'trash-2', key: 'Subscriptions', color: 'bg-rose-500', hex: '#f43f5e' },
-                ];
-
-                const features = [
-                    { title: 'Momentum Logic', desc: 'Watch how injections crush your debt velocity.', icon: 'zap', color: 'bg-indigo-600' },
-                    { title: '70% Home Stretch', desc: 'The critical turning point in habits.', icon: 'trophy', color: 'bg-emerald-600' },
-                    { title: 'Real-time Sync', desc: 'Cloud powered data via Supabase.', icon: 'cloud', color: 'bg-blue-600' }
-                ];
-
-                const markers = [{ p: 0, l: 'Launch' }, { p: 70, l: 'Home Stretch', target: true }, { p: 100, l: 'Kaizen' }];
-
-                onMounted(async () => {
-                    const { data: { session } } = await supabaseClient.auth.getSession();
-                    if (session) {
-                        user.value = session.user;
-                        await loadProfile();
-                        authState.value = 'dashboard';
-                        fetchDebts();
-                    }
-                    isLoading.value = false;
-                    initIcons();
-
-                    supabaseClient.auth.onAuthStateChange(async (_event, session) => {
-                        if (session) {
-                            user.value = session.user;
-                            await loadProfile();
-                            authState.value = 'dashboard';
-                            fetchDebts();
-                        } else {
-                            user.value = null;
-                            if (authState.value === 'dashboard') authState.value = 'landing';
-                        }
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        toast.classList.remove('translate-y-10', 'opacity-0');
                     });
                 });
 
-                const handleAuth = async () => {
-                    isLoadingAuth.value = true;
-                    try {
-                        if (authState.value === 'login') {
-                            const { error } = await supabaseClient.auth.signInWithPassword({ email: authData.value.email, password: authData.value.password });
-                            if (error) throw error;
-                        } else {
-                            const { data, error } = await supabaseClient.auth.signUp({ 
-                                email: authData.value.email, 
-                                password: authData.value.password,
-                                options: { data: { name: authData.value.name } }
+                setTimeout(() => {
+                    toast.classList.add('translate-y-10', 'opacity-0');
+                    setTimeout(() => toast.remove(), 300);
+                }, 3000);
+            }
+
+            // --- Navigation Logic ---
+            const pages = {
+                'nav-call-log': document.getElementById('page-call-log'),
+                'nav-visit-request': document.getElementById('page-visit-request'),
+                'nav-visit-queue': document.getElementById('page-visit-queue')
+            };
+
+            Object.keys(pages).forEach(navId => {
+                const btn = document.getElementById(navId);
+                if(btn) {
+                    btn.addEventListener('click', () => {
+                        Object.keys(pages).forEach(id => {
+                            if(document.getElementById(id)) document.getElementById(id).classList.remove('active');
+                            if(pages[id]) pages[id].classList.add('hidden');
+                        });
+                        document.querySelectorAll('.top-nav-item').forEach(el => el.classList.remove('active'));
+                        btn.classList.add('active');
+                        if(pages[navId]) pages[navId].classList.remove('hidden');
+                    });
+                }
+            });
+
+            if (document.getElementById('nav-call-log')) {
+                document.getElementById('nav-call-log').classList.add('active');
+            }
+
+            // --- Utility: Copy to Clipboard ---
+            function copyToClipboard(text, btnElement) {
+                if(!text) return;
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                textArea.style.position = 'fixed'; 
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                
+                try {
+                    document.execCommand('copy');
+                    if (btnElement) {
+                        if (!btnElement.dataset.originalContent) {
+                            btnElement.dataset.originalContent = btnElement.innerHTML;
+                        }
+                        if (btnElement.copyTimeout) clearTimeout(btnElement.copyTimeout);
+                        btnElement.innerHTML = `<span class="flex items-center gap-2 animate-[popIn_0.2s_ease-out]"><svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg><span class="text-emerald-400">COPIED</span></span>`;
+                        btnElement.classList.add('btn-copied');
+                        btnElement.copyTimeout = setTimeout(() => {
+                            btnElement.innerHTML = btnElement.dataset.originalContent;
+                            btnElement.classList.remove('btn-copied');
+                            delete btnElement.dataset.originalContent; 
+                            delete btnElement.copyTimeout;
+                        }, 1000);
+                    }
+                } catch (err) {
+                    showToast('Failed to copy to clipboard.', 'error');
+                }
+                document.body.removeChild(textArea);
+            }
+
+            // --- STREAMING_CHUNK:Initializing Call Log Logic... ---
+            // --- Call Log Generator ---
+            const scenarios = {
+                "Incoming Call": [
+                    "Out past curfew",          
+                    "Left home during the curfew",  
+                    "DW called", 
+                    "Battery status check", 
+                    "Charger faults", 
+                    "Hospital", 
+                    "Visit enquiries", 
+                    "No response",
+                    "Call got disconnected",
+                    "Call back requests",
+                    "Returning Missed Call",
+                    "Order enquiries",
+                    "Emergency services required",
+                    "Other incident"
+                ],
+                "PD Call": [
+                    "Out past curfew",             
+                    "Left home during the curfew", 
+                    "Denied lateness",  
+                    "Denied absence during curfew",
+                    "Denied absence (Multiple addresses)",
+                    "Denied absence (Battery low )",
+                    "Equipment tamper",
+                    "Equipment power off",
+                    "Power off during visit",
+                    "Equipment low battery",
+                    "No response",
+                    "Call got disconnected",
+                    "Other incident"
+                ]
+            };
+            
+            const clContainer = document.getElementById('scenario-buttons');
+            let clState = { 
+                type: 'PD Call', 
+                event: null,
+                caller: 'DW',
+                violationStatus: 'denied',
+                visitEnquiryType: 'pending',
+                resolutionStatus: 'resolved'
+            };
+            
+            // UI Updates for Caller Types
+            const btnDw = document.getElementById('caller-dw');
+            const btnRel = document.getElementById('caller-rel');
+            const btnPol = document.getElementById('caller-pol');
+            const inputsRel = document.getElementById('caller-inputs-rel');
+            const inputsPol = document.getElementById('caller-inputs-pol');
+            
+            const btnViolDenied = document.getElementById('btn-viol-denied');
+            const btnViolAdmitted = document.getElementById('btn-viol-admitted');
+            const violationContainer = document.getElementById('violation-container');
+
+            function updateCallerUI() {
+                const scenarioContainer = document.getElementById('scenario-container');
+                const customInput = document.getElementById('call-log-custom-details');
+                
+                [btnDw, btnRel, btnPol].forEach(b => {
+                    if(b) b.className = 'flex-1 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wide text-slate-400 hover:text-slate-300 hover:bg-slate-800 transition-all border border-transparent';
+                });
+                
+                // Hide Police button for PD Calls
+                if (clState.type === 'PD Call') {
+                    if (btnPol) btnPol.classList.add('hidden');
+                } else {
+                    if (btnPol) btnPol.classList.remove('hidden');
+                }
+
+                if(inputsRel) inputsRel.classList.add('hidden');
+                if(inputsPol) inputsPol.classList.add('hidden');
+
+                if (clState.caller === 'DW') {
+                    if(btnDw) btnDw.className = 'flex-1 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wide bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 shadow-[0_0_15px_rgba(99,102,241,0.2)] transition-all';
+                    if(scenarioContainer) scenarioContainer.classList.remove('hidden');
+                    if(customInput) customInput.placeholder = "Type details here to update log instantly...";
+                } else if (clState.caller === 'Others') {
+                    if(btnRel) btnRel.className = 'flex-1 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wide bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 shadow-[0_0_15px_rgba(99,102,241,0.2)] transition-all';
+                    if(inputsRel) inputsRel.classList.remove('hidden');
+                    if(scenarioContainer) scenarioContainer.classList.remove('hidden');
+                    if(customInput) customInput.placeholder = "Type what the other person stated here...";
+                } else if (clState.caller === 'Police') {
+                    if(btnPol) btnPol.className = 'flex-1 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wide bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 shadow-[0_0_15px_rgba(99,102,241,0.2)] transition-all';
+                    if(inputsPol) inputsPol.classList.remove('hidden');
+                    if(scenarioContainer) scenarioContainer.classList.add('hidden');
+                    if(customInput) customInput.placeholder = "Type the information the police provided here...";
+                }
+                updateLogOutput();
+            }
+
+            if(btnDw) btnDw.addEventListener('click', () => { clState.caller = 'DW'; clState.event = null; updateCallerUI(); renderScenarioButtons(); });
+            if(btnRel) btnRel.addEventListener('click', () => { clState.caller = 'Others'; clState.event = 'Other Default'; updateCallerUI(); renderScenarioButtons(); });
+            if(btnPol) btnPol.addEventListener('click', () => { clState.caller = 'Police'; clState.event = null; updateCallerUI(); renderScenarioButtons(); });
+
+            function updateViolationUI() {
+                if (!btnViolDenied || !btnViolAdmitted) return;
+                if (clState.violationStatus === 'denied') {
+                    btnViolDenied.className = 'flex-1 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wide bg-purple-500/20 text-purple-400 border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.2)] transition-all';
+                    btnViolAdmitted.className = 'flex-1 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wide text-slate-400 hover:text-slate-300 hover:bg-slate-800 transition-all border border-transparent';
+                } else {
+                    btnViolAdmitted.className = 'flex-1 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wide bg-purple-500/20 text-purple-400 border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.2)] transition-all';
+                    btnViolDenied.className = 'flex-1 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wide text-slate-400 hover:text-slate-300 hover:bg-slate-800 transition-all border border-transparent';
+                }
+                updateLogOutput();
+            }
+
+            if(btnViolDenied) btnViolDenied.addEventListener('click', () => { clState.violationStatus = 'denied'; updateViolationUI(); updateScenarioExtrasVisibility(); updateResolutionUI(); });
+            if(btnViolAdmitted) btnViolAdmitted.addEventListener('click', () => { clState.violationStatus = 'admitted'; updateViolationUI(); updateScenarioExtrasVisibility(); updateResolutionUI(); });
+
+            // --- Resolution Status Logic ---
+            const btnResResolved = document.getElementById('btn-res-resolved');
+            const btnResUnresolved = document.getElementById('btn-res-unresolved');
+            const resolutionContainer = document.getElementById('resolution-container');
+
+            function updateResolutionUI() {
+                if (!btnResResolved || !btnResUnresolved) return;
+                if (clState.resolutionStatus === 'resolved') {
+                    btnResResolved.className = 'flex-1 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wide bg-orange-500/20 text-orange-400 border border-orange-500/30 shadow-[0_0_15px_rgba(249,115,22,0.2)] transition-all';
+                    btnResUnresolved.className = 'flex-1 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wide text-slate-400 hover:text-slate-300 hover:bg-slate-800 transition-all border border-transparent';
+                } else {
+                    btnResUnresolved.className = 'flex-1 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wide bg-rose-500/20 text-rose-400 border border-rose-500/30 shadow-[0_0_15px_rgba(244,63,94,0.2)] transition-all';
+                    btnResResolved.className = 'flex-1 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wide text-slate-400 hover:text-slate-300 hover:bg-slate-800 transition-all border border-transparent';
+                }
+                updateLogOutput();
+            }
+
+            if(btnResResolved) btnResResolved.addEventListener('click', () => { clState.resolutionStatus = 'resolved'; updateResolutionUI(); });
+            if(btnResUnresolved) btnResUnresolved.addEventListener('click', () => { clState.resolutionStatus = 'unresolved'; updateResolutionUI(); });
+
+            // --- Visit Enquiry UI Logic ---
+            const btnVePending = document.getElementById('btn-ve-pending');
+            const btnVeMissed = document.getElementById('btn-ve-missed');
+            const btnVeNew = document.getElementById('btn-ve-new');
+            const veNewInputs = document.getElementById('ve-new-inputs');
+
+            function updateVisitEnquiryUI() {
+                if(!btnVePending) return;
+                [btnVePending, btnVeMissed, btnVeNew].forEach(b => {
+                    b.className = 'flex-1 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wide text-slate-400 hover:text-slate-300 hover:bg-slate-800 transition-all border border-transparent';
+                });
+                
+                if (veNewInputs) veNewInputs.classList.add('hidden');
+
+                if (clState.visitEnquiryType === 'pending') {
+                    btnVePending.className = 'flex-1 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wide bg-amber-500/20 text-amber-400 border border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.2)] transition-all';
+                } else if (clState.visitEnquiryType === 'missed') {
+                    btnVeMissed.className = 'flex-1 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wide bg-amber-500/20 text-amber-400 border border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.2)] transition-all';
+                } else if (clState.visitEnquiryType === 'new') {
+                    btnVeNew.className = 'flex-1 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wide bg-amber-500/20 text-amber-400 border border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.2)] transition-all';
+                    if (veNewInputs) veNewInputs.classList.remove('hidden');
+                }
+                updateLogOutput();
+            }
+
+            if(btnVePending) btnVePending.addEventListener('click', () => { clState.visitEnquiryType = 'pending'; updateVisitEnquiryUI(); });
+            if(btnVeMissed) btnVeMissed.addEventListener('click', () => { clState.visitEnquiryType = 'missed'; updateVisitEnquiryUI(); });
+            if(btnVeNew) btnVeNew.addEventListener('click', () => { clState.visitEnquiryType = 'new'; updateVisitEnquiryUI(); });
+
+            const veAddBtn = document.getElementById('ve-add-btn');
+            if(veAddBtn) {
+                veAddBtn.addEventListener('click', () => {
+                    const name = document.getElementById('ve-new-name').value.trim();
+                    const orderId = document.getElementById('ve-new-id').value.trim();
+                    const reason = document.getElementById('ve-new-reason').value.trim();
+                    
+                    if (name && reason) {
+                        if (typeof visitQueue !== 'undefined' && typeof saveQueueLocally === 'function' && typeof renderQueue === 'function') {
+                            visitQueue.push({ id: Date.now().toString(), name: name, orderId: orderId, reason: reason, done: false });
+                            saveQueueLocally(); 
+                            renderQueue();
+                            showToast("Added to Visit Queue", "success");
+                            document.getElementById('ve-new-name').value = '';
+                            document.getElementById('ve-new-id').value = '';
+                        }
+                    } else {
+                        showToast("Please enter a Name and Reason", "error");
+                    }
+                });
+            }
+
+            function updateScenarioExtrasVisibility() {
+                if (!violationContainer) return;
+                
+                // Violation
+                if ((clState.event === 'Equipment tamper' || clState.event === 'Equipment power off') && clState.type === 'PD Call') {
+                    violationContainer.classList.remove('hidden');
+                } else {
+                    violationContainer.classList.add('hidden');
+                }
+
+                // Resolution
+                if (resolutionContainer) {
+                    if (clState.event === 'Equipment power off' && clState.type === 'PD Call' && clState.violationStatus === 'admitted') {
+                        resolutionContainer.classList.remove('hidden');
+                    } else {
+                        resolutionContainer.classList.add('hidden');
+                    }
+                }
+
+                // Hospital
+                const hospContainer = document.getElementById('hospital-container');
+                if (hospContainer) {
+                    if (clState.event === 'Hospital' && clState.type === 'Incoming Call') {
+                        hospContainer.classList.remove('hidden');
+                    } else {
+                        hospContainer.classList.add('hidden');
+                    }
+                }
+
+                // Visit Enquiries
+                const veContainer = document.getElementById('visit-enq-container');
+                if (veContainer) {
+                    if (clState.event === 'Visit enquiries' && clState.type === 'Incoming Call') {
+                        veContainer.classList.remove('hidden');
+                    } else {
+                        veContainer.classList.add('hidden');
+                    }
+                }
+            }
+
+            // Listen to all inputs to instantly live-update the text area
+            ['cl-rel-relation', 'cl-pol-name', 'cl-pol-badge', 'cl-pol-station', 'cl-pol-pass', 'cl-hosp-name', 've-new-name', 've-new-id', 've-new-reason'].forEach(id => {
+                const el = document.getElementById(id);
+                if(el) el.addEventListener(el.type === 'checkbox' ? 'change' : 'input', updateLogOutput);
+            });
+
+            function renderScenarioButtons() {
+                if(!clContainer) return;
+                clContainer.innerHTML = '';
+                
+                let events = [];
+                if (clState.caller === 'Others') {
+                    events = ["Other Default", "LHDC - DW sleeping", "OPC - DW running late"];
+                } else {
+                    events = scenarios[clState.type] || [];
+                }
+                
+                events.forEach((evt, index) => {
+                    const btn = document.createElement('button');
+                    btn.className = `scenario-btn w-full h-16 rounded-2xl text-sm font-bold text-slate-300 transition-all uppercase tracking-wide ${clState.event === evt ? 'selected' : ''} animate-enter`;
+                    btn.style.animationDelay = `${index * 50}ms`;
+                    btn.textContent = evt;
+                    btn.addEventListener('click', () => {
+                        clState.event = evt;
+                        clState.violationStatus = 'denied'; // default to denial when switching scenarios
+                        clState.resolutionStatus = 'resolved'; // reset resolution too
+                        updateViolationUI();
+                        updateResolutionUI();
+                        renderScenarioButtons();
+                        updateScenarioExtrasVisibility();
+                        updateLogOutput();
+                    });
+                    clContainer.appendChild(btn);
+                });
+            }
+
+            const btnInbound = document.getElementById('btn-type-inbound');
+            const btnPd = document.getElementById('btn-type-pd');
+
+            function updateCallTypeUI() {
+                if (clState.type === "PD Call") {
+                    btnPd.classList.add('active');
+                    btnPd.classList.remove('text-slate-400');
+                    btnInbound.classList.remove('active');
+                    btnInbound.classList.add('text-slate-400');
+                    
+                    // Auto-reset caller to DW if Police was selected when switching to PD Call
+                    if (clState.caller === 'Police') {
+                        clState.caller = 'DW';
+                    }
+                } else {
+                    btnInbound.classList.add('active');
+                    btnInbound.classList.remove('text-slate-400');
+                    btnPd.classList.remove('active');
+                    btnPd.classList.add('text-slate-400');
+                }
+                
+                updateCallerUI(); // Instantly refresh UI state when type changes
+            }
+
+            if(btnInbound && btnPd) {
+                btnInbound.addEventListener('click', () => {
+                    clState.type = "Incoming Call";
+                    clState.event = null;
+                    updateCallTypeUI();
+                    renderScenarioButtons();
+                    updateScenarioExtrasVisibility();
+                    updateLogOutput();
+                });
+                btnPd.addEventListener('click', () => {
+                    clState.type = "PD Call";
+                    clState.event = null;
+                    updateCallTypeUI();
+                    renderScenarioButtons();
+                    updateScenarioExtrasVisibility();
+                    updateLogOutput();
+                });
+            }
+
+            const clCustomInput = document.getElementById('call-log-custom-details');
+            if(clCustomInput) clCustomInput.addEventListener('input', updateLogOutput);
+            
+            // Visit Required Logic Setup
+            const clVisitReq = document.getElementById('cl-visit-required');
+            const clVisitInputs = document.getElementById('cl-visit-inputs');
+            
+            if(clVisitReq) {
+                clVisitReq.addEventListener('change', (e) => {
+                    if (e.target.checked) {
+                        clVisitInputs.classList.remove('hidden');
+                    } else {
+                        clVisitInputs.classList.add('hidden');
+                    }
+                    updateLogOutput();
+                });
+            }
+
+            const clVisitBtn = document.getElementById('cl-visit-btn');
+            if (clVisitBtn) {
+                clVisitBtn.addEventListener('click', () => {
+                    const name = document.getElementById('cl-visit-name').value.trim();
+                    const orderId = document.getElementById('cl-visit-id').value.trim();
+                    const reason = document.getElementById('cl-visit-reason').value.trim();
+                    
+                    if (name && reason) {
+                        if (typeof visitQueue !== 'undefined' && typeof saveQueueLocally === 'function' && typeof renderQueue === 'function') {
+                            // Inject directly into the Visit Queue's local storage array
+                            visitQueue.push({
+                                id: Date.now().toString(), 
+                                name: name, 
+                                orderId: orderId,
+                                reason: reason, 
+                                done: false 
                             });
-                            if (error) throw error;
-                            if (data.user) {
-                                await supabaseClient.from('profiles').upsert([{ id: data.user.id, name: authData.value.name, email: authData.value.email }]);
-                                showToast("Confirm your email or log in!");
+                            saveQueueLocally(); 
+                            renderQueue();
+                            showToast("Added to Visit Queue", "success");
+                            
+                            // Reset just the name and ID for quick successive entries, leave reason
+                            document.getElementById('cl-visit-name').value = '';
+                            document.getElementById('cl-visit-id').value = '';
+                        }
+                    } else {
+                        showToast("Please enter a Name and Reason", "error");
+                    }
+                });
+            }
+
+            // Track if user manually edits the title
+            const titleOutEl = document.getElementById('call-title-output');
+            if(titleOutEl) {
+                titleOutEl.addEventListener('input', () => {
+                    titleOutEl.dataset.manuallyEdited = "true";
+                });
+            }
+
+            function updateLogOutput() {
+                const titleOut = document.getElementById('call-title-output');
+                const logOut = document.getElementById('log-output');
+                const customText = clCustomInput.value;
+                let rawLog = ""; 
+                let newTitle = "";
+
+                if (clState.caller !== 'DW') {
+                    const callAction = clState.type === 'Incoming Call' ? 'called' : 'answered';
+                    
+                    if (clState.caller === 'Others') {
+                        const relInput = document.getElementById('cl-rel-relation').value.trim();
+                        const rel = relInput || 'Other person';
+                        const statementPrefix = relInput ? `DW's ${relInput}` : 'Other person';
+                        
+                        newTitle = `${clState.type} - ${relInput ? "DW's " + relInput : "Other person"}`;
+                        
+                        let callStatementStr = "";
+                        let onBehalfStr = clState.type === 'PD Call' ? 'answered the phone on behalf of DW / with DW\'s device and ' : '';
+                        
+                        if (clState.event === 'LHDC - DW sleeping') {
+                            callStatementStr = `${statementPrefix} ${onBehalfStr}stated that DW is currently sleeping and had not left home during the curfew. ${customText}`;
+                        } else if (clState.event === 'OPC - DW running late') {
+                            callStatementStr = `${statementPrefix} ${onBehalfStr}stated that DW is currently running late and is currently on his way. ${customText}`;
+                        } else {
+                            if (clState.type === 'PD Call') {
+                                callStatementStr = `${statementPrefix} answered the phone on behalf of DW / with DW's device and stated that ${customText}`;
+                            } else {
+                                // Incoming calls
+                                callStatementStr = `${statementPrefix} stated that ${customText}`;
                             }
                         }
-                    } catch (e) {
-                        showToast(e.message);
-                    } finally {
-                        isLoadingAuth.value = false;
+                        rawLog = `Caller details: ${rel} (Other) ${callAction}\nRV's confirmed: Name, Address\nCaller statement: ${callStatementStr}\nAgents statement: I advised that the call will be documented\nFurther actions required: N/A`;
+                    } else if (clState.caller === 'Police') {
+                        const pName = document.getElementById('cl-pol-name').value.trim();
+                        const pBadge = document.getElementById('cl-pol-badge').value.trim();
+                        const pStation = document.getElementById('cl-pol-station').value.trim();
+                        const pPass = document.getElementById('cl-pol-pass').checked ? 'Police Password confirmed' : 'Password NOT confirmed';
+                        const officerStr = pName ? `Police officer ${pName}` : 'Police officer';
+                        const statementPrefix = pName ? pName : 'Police officer';
+                        
+                        newTitle = `${clState.type} - Police`;
+                        
+                        if (clState.type === 'Incoming Call') {
+                            // Incoming calls: Statement before Agent's statement
+                            rawLog = `Caller details: ${officerStr} ${callAction}\nBadge Number: ${pBadge || 'N/A'}\nPolice station: ${pStation || 'N/A'}\nRV's confirmed: ${pPass}\nCaller statement: ${statementPrefix} stated that ${customText}\nAgents statement: I advised that the call will be documented\nFurther actions required: N/A`;
+                        } else {
+                            rawLog = `Caller details: ${officerStr} ${callAction}\nBadge Number: ${pBadge || 'N/A'}\nPolice station: ${pStation || 'N/A'}\nRV's confirmed: ${pPass}\nAgents statement: I advised that the call will be documented\nCaller statement: ${statementPrefix} stated that ${customText}\nFurther actions required: N/A`;
+                        }
                     }
+                    
+                    // Automatically append Visit Requested if toggle is on
+                    if (clVisitReq && clVisitReq.checked && !rawLog.includes("Visit required")) {
+                        rawLog = rawLog.replace(/Further actions required: N\/A/i, "Further actions required: Visit required");
+                    }
+                    
+                    logOut.value = rawLog;
+                    
+                    // Smart Title Overwrite Logic
+                    if (!titleOut.dataset.manuallyEdited || titleOut.dataset.lastAuto === titleOut.value) {
+                        titleOut.value = newTitle;
+                        titleOut.dataset.lastAuto = newTitle;
+                    }
+                    return; 
+                }
+
+                if (!clState.event) {
+                    if (!titleOut.dataset.manuallyEdited || titleOut.dataset.lastAuto === titleOut.value) {
+                        titleOut.value = '';
+                        titleOut.dataset.lastAuto = '';
+                    }
+                    logOut.value = '';
+                    return;
+                }
+
+                if (clState.event === 'Other incident' || clState.event === 'Other incidents' || clState.event === 'DW called') {
+                    newTitle = `${clState.type} - ${clState.event}`;
+                } else if (clState.event === 'No response') {
+                    newTitle = `${clState.type} - No response`;
+                } else {
+                    newTitle = `${clState.type} - ${clState.event}`;
+                }
+
+                // Smart Title Overwrite Logic
+                if (!titleOut.dataset.manuallyEdited || titleOut.dataset.lastAuto === titleOut.value) {
+                    titleOut.value = newTitle;
+                    titleOut.dataset.lastAuto = newTitle;
+                }
+
+                const pdCallTemplates = {
+                    "Out past curfew": `Caller details: Device wearer
+RV's confirmed: Name, DOB, Address
+Agents statement: I advised DW about the lateness for curfew including the time & duration of the lateness.
+DW's statement: Device wearer advised that ${customText || ""}
+Further actions required: N/A`,
+
+                    "Left home during the curfew": `Caller details: Device wearer
+RV's confirmed: Name, DOB, Address
+Agents statement: I advised DW about the absence for curfew including the time & duration of the absence.
+DW's statement: Device wearer advised that ${customText || ""}
+Further actions required: N/A`,
+
+                    "Denied lateness": `Caller details: Device wearer
+RV's confirmed: Name, DOB, Address
+Agents statement: I advised DW about the lateness for curfew including the time & duration of the lateness.
+DW's statement: Device wearer denied the lateness and advised being on time for curfew.${customText ? ' ' + customText : ''}
+Further actions required: N/A`,
+
+                    "Denied absence during curfew": `Caller details: Device wearer
+RV's confirmed: Name, DOB, Address
+Agents statement: I advised DW about the absence for curfew including the time & duration of the absence.
+DW's statement: Device wearer denied the absence and advised not leaving during the curfew.${customText ? ' ' + customText : ''}
+Further actions required: N/A`,
+
+                    "Denied absence (Multiple addresses)": `Caller details: Device wearer
+RV's confirmed: Name, DOB, Address
+Agents statement: I advised DW about the lateness for curfew including the time & duration of the lateness.
+DW's statement: Device wearer denied the lateness and advised that he has multiple addresses${customText ? ' ' + customText : ''}
+Further actions required: N/A`,
+
+                    "Denied absence (Battery low )": `Caller details: Device wearer
+RV's confirmed: Name, DOB, Address
+Agents statement: I advised DW about the lateness for curfew including the time & duration of the lateness.
+DW's statement: Device wearer denied the lateness but advised that his battery is low and it will be put on charge.${customText ? ' ' + customText : ''}
+Further actions required: N/A`,
+
+                    "Equipment tamper": clState.violationStatus === 'admitted' 
+                        ? `Caller details: Device wearer
+RV's confirmed: Name, DOB, Address
+Agents statement: I advised DW that we've received a tamper warning alert from the device and confirmed if there had been any tamper with the device.
+DW's statement: DW advised that ${customText || ""}
+Further actions required: N/A`
+                        : `Caller details: Device wearer
+RV's confirmed: Name, DOB, Address
+Agents statement: I advised DW that we've received a tamper warning alert from the device and confirmed if there had been any tamper with the device.
+DW's statement: Device wearer denied tamper and advised no tamper incident on the tag.${customText ? ' ' + customText : ''}
+Further actions required: N/A`,
+
+                    "Equipment power off": clState.violationStatus === 'admitted' 
+                        ? (clState.resolutionStatus === 'resolved'
+                            ? `Caller details: Device wearer answered\nRV's confirmed: Name, DOB, Address\nAgents statement: I advised DW that there had been a power loss warning from the Tag phone and confirmed any power loss incident at the address.\nDW's statement: DW advised that there was a power loss incident at the property but it's back on now.${customText ? ' ' + customText : ''}\nFurther actions required: N/A`
+                            : `Caller details: Device wearer answered\nRV's confirmed: Name, DOB, Address\nAgents statement: I advised DW that there had been a power loss warning from the Tag phone and confirmed any power loss incident at the address.\nDW's statement: DW advised that there was a power loss incident at the property but it's yet to be resolved.${customText ? ' ' + customText : ''}\nFurther actions required: N/A`)
+                        : `Caller details: Device wearer answered
+RV's confirmed: Name, DOB, Address
+Agents statement: I advised DW that there had been a power loss warning from the Tag phone and confirmed any power loss incident at the address.
+DW's statement: Device wearer denied power loss and stated that the tag phone is plugged in and working.${customText ? ' ' + customText : ''}
+Further actions required: N/A`,
+
+                    "Power off during visit": `Caller details: Device wearer answered
+RV's confirmed: Name, DOB, Address
+Agents statement: I advised DW that there had been a power loss warning from the Tag phone and confirmed any power loss incident at the address.
+DW's statement: DW advised that the power loss incident was as a result of the FMO visit tonight.${customText ? ' ' + customText : ''}
+Further actions required: N/A`,
+
+                    "Equipment low battery": `Caller details: Device wearer answered
+RV's confirmed: Name, DOB, Address
+Agents statement: I advised that the tag is currently below 10% and needs to be placed on charge as soon as possible.
+DW's statement: DW advised that he will put the tag on charge. ${customText ? ' ' + customText : ''}
+Further actions required: N/A`,
+
+                    "Call got disconnected": `Caller details: Device wearer answered
+RV's confirmed: Not confirmed
+Agents statement: N/A
+DW's statement: N/A
+Call got disconnected. ${customText || ""}
+Further actions required: N/A`,
+
+                    "Other incident": `Caller details: Device wearer
+RV's confirmed: Name, DOB, Address
+Agents statement: Custom notes added.
+DW's statement: ${customText || "Custom notes"}
+Further actions required: N/A`
                 };
 
-                const loadProfile = async () => {
-                    if (!user.value) return;
-                    const { data } = await supabaseClient.from('profiles').select('name').eq('id', user.value.id).single();
-                    userName.value = data?.name || user.value.user_metadata?.name || 'Warrior';
+                const hospName = document.getElementById('cl-hosp-name') ? document.getElementById('cl-hosp-name').value.trim() : '';
+                const hospStr = hospName ? ` going to/admitted at ${hospName}.` : ' going to the hospital.';
+                
+                let visitEnqStr = '';
+                let visitEnqAgentStr = 'I advised that the call will be documented.';
+                if (clState.visitEnquiryType === 'pending') {
+                    visitEnqStr = `DW wanted an update on their pending visit.`;
+                    visitEnqAgentStr = `I advised about the pending visit and the call will be documented.`;
+                } else if (clState.visitEnquiryType === 'missed') {
+                    visitEnqStr = `DW advised that they had missed their visit.`;
+                    visitEnqAgentStr = `I advised about the missed visit and they'll need to request for a further visit through their responsible officer.`;
+                } else if (clState.visitEnquiryType === 'new') {
+                    visitEnqStr = `DW requested a new visit.`;
+                    visitEnqAgentStr = `I advised that a new visit will be requested and the call will be documented.`;
+                }
+
+                const incomingSpecificTemplates = {
+                    "Out past curfew": `Caller details: Device wearer called
+RV's confirmed: Name, DOB, Address
+DW's statement: DW advised that ${customText || ""}
+Agent's statement: I advised that the call will be documented.
+Further actions required: N/A`,
+
+                    "Left home during the curfew": `Caller details: Device wearer called
+RV's confirmed: Name, DOB, Address
+DW's statement: DW advised that ${customText || ""}
+Agent's statement: I advised that the call will be documented.
+Further actions required: N/A`,
+                    
+                    "DW called": `Caller details: Device wearer called
+RV's confirmed: Name, DOB, Address
+DW's statement: DW advised that ${customText || ""}
+Agent's statement: I advised that the call will be documented.
+Further actions required: N/A`,
+
+                    "Battery status check": `Caller details: Device wearer called
+RV's confirmed: Name, DOB, Address
+DW's statement: DW advised that they wanted to check the battery percentage. ${customText || ""}
+Agent's statement: I advised about the battery percentage and that the call will be documented.
+Further actions required: N/A`,
+
+                    "Charger faults": `Caller details: Device wearer called
+RV's confirmed: Name, DOB, Address
+DW's statement: DW advised that their equipment charger isn't working and they need a replacement. ${customText || ""}
+Agent's statement: I advised that a new charger will be requested.
+Further actions required: N/A`,
+
+                    "Hospital": `Caller details: Device wearer called
+RV's confirmed: Name, DOB, Address
+DW's statement: DW advised that they will be${hospStr} ${customText || ""}
+Agent's statement: I advised DW to get PW whilst at the hospital.
+Further actions required: N/A`,
+
+                    "Returning Missed Call": `Caller details: Device wearer called
+RV's confirmed: Name, DOB, Address
+DW's statement: DW advised returning a missed call and wanted to know the reason for the call.
+Agent's statement: I advised that ${customText || ""}
+Further actions required: N/A`,
+
+                    "Visit enquiries": `Caller details: Device wearer called
+RV's confirmed: Name, DOB, Address
+DW's statement: ${visitEnqStr} ${customText || ""}
+Agent's statement: ${visitEnqAgentStr}
+Further actions required: N/A`,
+
+                    "Call back requests": `Caller details: Device wearer called
+RV's confirmed: Name, DOB, Address
+DW's statement: DW returning a call back
+Agent's statement: I advised ${customText || ""}
+Further actions required: N/A`,
+
+                    "Order enquiries": `Caller details: Device wearer called
+RV's confirmed: Name, DOB, Address
+DW's statement: DW had an enquiry regarding their order. ${customText || ""}
+Agent's statement: I advised accordingly and that the call will be documented.
+Further actions required: N/A`,
+
+                    "Emergency services required": `Caller details: Device wearer called
+RV's confirmed: Name, DOB, Address
+DW's statement: DW advised they require emergency services. ${customText || ""}
+Agent's statement: I advised them to contact 999 immediately.
+Further actions required: N/A`,
+
+                    "Call got disconnected": `Caller details: Device wearer called
+RV's confirmed: Not confirmed
+DW's statement: N/A
+Agent's statement: N/A
+Call got disconnected. ${customText || ""}
+Further actions required: N/A`,
+
+                    "Other incident": `Caller details: Device wearer called
+RV's confirmed: Name, DOB, Address
+DW's statement: DW called
+Agent's statement: I advised ${customText || ""}
+Further actions required: N/A`
                 };
 
-                const fetchDebts = async () => {
-                    if (!user.value) return;
-                    const { data } = await supabaseClient.from('debts').select('*').order('created_at', { ascending: false });
-                    if (data) debts.value = data;
-                    initIcons();
+                const pdFallbackMappings = {
+                    "Equipment tamper": { s: "DW advised that the equipment has been tampered with", a: "the issue needs to be investigated" },
+                    "Denied absence during curfew": { s: "DW advised that they did not leave the property during curfew", a: "the absence will be documented" },
+                    "Denied lateness": { s: "DW advised that they were not late for curfew", a: "the absence will be documented" },
+                    "Other incident": { s: `DW advised that ${customText || ""}`, a: "the call will be documented" }
                 };
 
-                const handleLogout = async () => { await supabaseClient.auth.signOut(); authState.value = 'landing'; debts.value = []; };
-                const navigateTo = (page) => { currentPage.value = page; initIcons(); };
-                const initIcons = () => setTimeout(() => lucide.createIcons(), 150);
+                if (clState.event === "No response") {
+                    rawLog = `No response`;
+                } else if (clState.type === "PD Call") {
+                    if (pdCallTemplates[clState.event]) {
+                        rawLog = pdCallTemplates[clState.event];
+                    } else if (clState.event === "Other Answered") {
+                        rawLog = `Caller details: Other person\nRV's confirmed: Name, Address\nAgents statement: I advised that the call will be documented\nCaller statement: Other person stated that ${customText || ""}\nFurther actions required: N/A`;
+                    } else {
+                        const map = pdFallbackMappings[clState.event] || pdFallbackMappings["Other incident"];
+                        rawLog = `Caller details: Device wearer answered\nRV's confirmed: Name, DOB, Address\nAgents statement: I advised that ${map.a}\nDW's statement: ${map.s}\nFurther actions required: N/A`;
+                    }
+                } else if (clState.type === "Incoming Call") {
+                    if (clState.event === "No response") {
+                        rawLog = `No response`;
+                    } else if (incomingSpecificTemplates[clState.event]) {
+                        rawLog = incomingSpecificTemplates[clState.event];
+                    } else {
+                        rawLog = incomingSpecificTemplates["Other incident"];
+                    }
+                }
 
-                const totalBalance = computed(() => debts.value.reduce((s, d) => s + (parseFloat(d.balance) || 0), 0));
-                const totalPaid = computed(() => debts.value.reduce((s, d) => s + (d.payments?.reduce((ps, p) => ps + p.amount, 0) || 0), 0));
-                const totalMinPayment = computed(() => debts.value.reduce((s, d) => s + (parseFloat(d.min_payment) || 0), 0));
-                const progressPercent = computed(() => {
-                    const original = totalBalance.value + totalPaid.value;
-                    return original > 0 ? Math.round((totalPaid.value / original) * 100) : 0;
-                });
+                // Automatically append Visit Requested if toggle is on
+                if (clVisitReq && clVisitReq.checked && rawLog !== "No response") {
+                    rawLog = rawLog.replace(/Further actions required: N\/A/i, "Further actions required: Visit required");
+                }
 
-                const mainStats = computed(() => [
-                    { title: 'Total debt', value: totalBalance.value, icon: 'trending-down', color: 'bg-rose-500/80', sub: 'Outstanding amount' },
-                    { title: 'Minimum payments', value: totalMinPayment.value, icon: 'calendar', color: 'bg-amber-500/80', sub: 'Mandatory burn' },
-                    { title: 'total payments', value: totalMinPayment.value + extraPayment.value, icon: 'zap', color: 'bg-indigo-500/80', sub: 'Velocity score' }
-                ]);
+                // --- SMART HEADER INJECTION (Caller Identity) ---
+                if (!rawLog || rawLog === "No response") {
+                    logOut.value = rawLog;
+                    return;
+                }
 
-                const categorySummaries = computed(() => {
-                    return categories.map(c => {
-                        const items = debts.value.filter(d => d.category === c.key);
-                        const bal = items.reduce((s, d) => s + (parseFloat(d.balance) || 0), 0);
-                        const paid = items.reduce((s, d) => s + (d.payments?.reduce((ps, p) => ps + p.amount, 0) || 0), 0);
-                        return { id: c.id, name: c.key, balance: bal, paid, pct: (bal + paid) > 0 ? (paid / (bal + paid)) * 100 : 0, color: c.color, icon: c.icon };
-                    });
-                });
+                let rvStatus = (clState.event === 'Call got disconnected') ? 'Not confirmed' : 'Name, DOB, Address';
+                let customHeader = `Caller details: Device wearer ${clState.type === 'Incoming Call' ? 'called' : 'answered'}\nRV's confirmed: ${rvStatus}\n`;
 
-                const isCategoryPage = computed(() => categories.some(c => c.id === currentPage.value));
-                const activeCategoryMeta = computed(() => categories.find(c => c.id === currentPage.value) || {});
-                const activeCategoryKey = computed(() => activeCategoryMeta.value.key);
-                const activeCategoryTotal = computed(() => debts.value.filter(d => d.category === activeCategoryKey.value).reduce((s, d) => s + (parseFloat(d.balance) || 0), 0));
-                const filteredDebts = computed(() => debts.value.filter(d => d.category === activeCategoryKey.value));
-
-                const addNewEntry = async () => {
-                    if (!user.value) return;
-                    await supabaseClient.from('debts').insert([{ name: `New ${activeCategoryKey.value}`, balance: 0, interest: 0, min_payment: 0, category: activeCategoryKey.value, user_id: user.value.id }]);
-                    fetchDebts();
-                };
-
-                const updateDebt = async (id, field, val) => {
-                    if (!user.value) return;
-                    await supabaseClient.from('debts').update({ [field]: val }).eq('id', id);
-                    fetchDebts();
-                };
-
-                const deleteDebt = async (id) => {
-                    if (!user.value) return;
-                    await supabaseClient.from('debts').delete().eq('id', id);
-                    fetchDebts();
-                    showToast("Removed Data Point");
-                };
-
-                const openHistory = (debt) => { activeDebt.value = debt; payAmount.value = null; };
-                const sortedPayments = computed(() => activeDebt.value?.payments ? [...activeDebt.value.payments].sort((a,b) => new Date(b.date) - new Date(a.date)) : []);
-
-                const submitPayment = async () => {
-                    if (!activeDebt.value || !payAmount.value) return;
-                    const newPayments = [...(activeDebt.value.payments || []), { amount: payAmount.value, date: payDate.value, id: crypto.randomUUID() }];
-                    const newBalance = Math.max(0, activeDebt.value.balance - payAmount.value);
-                    await supabaseClient.from('debts').update({ balance: newBalance, payments: newPayments }).eq('id', activeDebt.value.id);
-                    activeDebt.value = null; fetchDebts();
-                    showToast("Injected Success");
-                };
-
-                const showToast = (msg) => { notification.value = msg; setTimeout(() => notification.value = null, 4000); };
-
-                return {
-                    authState, user, isLoading, isLoadingAuth, currentPage, notification, debts, extraPayment, strategy, showPassword,
-                    authData, activeDebt, payAmount, payDate, totalBalance, totalPaid, totalMinPayment, progressPercent,
-                    mainStats, categorySummaries, isCategoryPage, activeCategoryMeta, activeCategoryKey, activeCategoryTotal, filteredDebts,
-                    handleAuth, handleLogout, navigateTo, addNewEntry, updateDebt, deleteDebt, openHistory, sortedPayments, submitPayment,
-                    userName, navItems, categories, features, markers
-                };
+                // Smart Regex to inject the header without deleting the statements
+                const headerRegex = /^Caller details:[\s\S]*?(?=Agents statement:|Agent'?s? statement:|DW's statement:|Caller statement:)/i;
+                
+                if (rawLog.match(headerRegex)) {
+                    logOut.value = rawLog.replace(headerRegex, customHeader);
+                } else {
+                    logOut.value = customHeader + rawLog; // Fallback
+                }
             }
-        }).mount('#app');
+
+            const copyCallTitleBtn = document.getElementById('copy-title-btn');
+            const copyCallLogBtn = document.getElementById('copy-log-btn');
+            if(copyCallTitleBtn) copyCallTitleBtn.addEventListener('click', () => copyToClipboard(document.getElementById('call-title-output').value, copyCallTitleBtn));
+            if(copyCallLogBtn) copyCallLogBtn.addEventListener('click', () => copyToClipboard(document.getElementById('log-output').value, copyCallLogBtn));
+
+            function resetCallLog() {
+                // 1. Reset state (keep current INCOMING / PD type, but reset everything else)
+                clState.event = null;
+                clState.caller = 'DW';
+                clState.violationStatus = 'denied';
+                clState.visitEnquiryType = 'pending';
+                clState.resolutionStatus = 'resolved';
+                
+                // 2. Clear all input values
+                document.getElementById('call-log-custom-details').value = '';
+                document.getElementById('cl-rel-relation').value = '';
+                document.getElementById('cl-pol-name').value = '';
+                document.getElementById('cl-pol-badge').value = '';
+                document.getElementById('cl-pol-station').value = '';
+                document.getElementById('cl-pol-pass').checked = false;
+                
+                if(document.getElementById('cl-hosp-name')) document.getElementById('cl-hosp-name').value = '';
+                if(document.getElementById('ve-new-name')) document.getElementById('ve-new-name').value = '';
+                if(document.getElementById('ve-new-id')) document.getElementById('ve-new-id').value = '';
+                if(document.getElementById('ve-new-reason')) document.getElementById('ve-new-reason').value = '';
+                
+                updateScenarioExtrasVisibility();
+                updateViolationUI();
+                updateVisitEnquiryUI();
+
+                // Reset smart title tracking
+                const titleOut = document.getElementById('call-title-output');
+                if (titleOut) {
+                    titleOut.dataset.manuallyEdited = "";
+                    titleOut.dataset.lastAuto = "";
+                    titleOut.value = "";
+                }
+
+                // 3. Reset Visit Required Toggle & Fields
+                if (clVisitReq) {
+                    clVisitReq.checked = false;
+                    clVisitInputs.classList.add('hidden');
+                }
+                document.getElementById('cl-visit-name').value = '';
+                document.getElementById('cl-visit-id').value = '';
+                document.getElementById('cl-visit-reason').value = '';
+
+                // 4. Update UI to reflect changes
+                updateCallerUI();
+                updateResolutionUI();
+                renderScenarioButtons();
+                updateLogOutput();
+                
+                showToast("Ready for next call!", "success");
+            }
+
+            const btnResetCall = document.getElementById('btn-reset-call');
+            if(btnResetCall) btnResetCall.addEventListener('click', resetCallLog);
+
+            updateCallTypeUI(); // Ensure initial load hides Police button since default is PD Call
+            renderScenarioButtons();
+
+
+            // --- STREAMING_CHUNK:Initializing Visit Request Logic... ---
+            // --- Visit Request Logic ---
+            const vrContainer = document.getElementById('vr-scenario-buttons');
+            const vrScenarios = ["Equipment Tamper", "Equipment Charger request", "Equipment Check", "Equipment Re-Range", "HMU replacement", "Strap too big", "Strap too small", "Consent Withdrawn", "Decom", "Install", "Equipment retrieval"];
+            let vrState = { equip: null, scenario: null, age: 'Adult' };
+
+            if(vrContainer) {
+                vrScenarios.forEach(sc => {
+                    const btn = document.createElement('button');
+                    btn.className = `scenario-btn w-full h-12 rounded-xl text-[11px] font-bold text-slate-300 transition-all uppercase tracking-wide flex items-center justify-center p-2 text-center`;
+                    btn.textContent = sc;
+                    btn.addEventListener('click', () => {
+                        document.querySelectorAll('#vr-scenario-buttons .scenario-btn').forEach(b => b.classList.remove('selected'));
+                        btn.classList.add('selected');
+                        vrState.scenario = sc;
+                    });
+                    vrContainer.appendChild(btn);
+                });
+            }
+
+            ['vr-equip-rf', 'vr-equip-gps'].forEach(id => {
+                const btn = document.getElementById(id);
+                if(btn) {
+                    btn.addEventListener('click', () => {
+                        document.querySelectorAll('[data-equip]').forEach(b => b.classList.remove('selected'));
+                        btn.classList.add('selected');
+                        vrState.equip = btn.dataset.equip;
+                    });
+                }
+            });
+
+            ['vr-age-adult', 'vr-age-child'].forEach(id => {
+                const btn = document.getElementById(id);
+                if(btn) {
+                    btn.addEventListener('click', () => {
+                        document.querySelectorAll('[data-age]').forEach(b => b.classList.remove('selected'));
+                        btn.classList.add('selected');
+                        vrState.age = btn.dataset.age;
+                    });
+                }
+            });
+
+            document.getElementById('vr-no-curfew')?.addEventListener('change', (e) => {
+                const disabled = e.target.checked;
+                document.getElementById('vr-curfew-start').disabled = disabled;
+                document.getElementById('vr-curfew-end').disabled = disabled;
+            });
+
+            document.getElementById('vr-generate-log-btn')?.addEventListener('click', () => {
+                if(!vrState.equip || !vrState.scenario) {
+                    showToast("Please select Equipment Type and Reason", "error");
+                    return;
+                }
+
+                let curfewText = 'NC';
+                if (!document.getElementById('vr-no-curfew').checked) {
+                    curfewText = `${document.getElementById('vr-curfew-start').value} - ${document.getElementById('vr-curfew-end').value}`;
+                }
+
+                const statements = {
+                    "Equipment Tamper": "DW advised a tamper on the equipment and the issue needs to be investigated.",
+                    "Equipment Charger request": "DW advised that the equipment charger is faulty and requires a replacement.",
+                    "Equipment Check": "DW advised that the tag keeps picking up as absence whilst in the property.",
+                    "Equipment Re-Range": "DW advised that the equipment keeps loosing signal whilst in the property.",
+                    "HMU replacement": "DW advised that their HMU is faulty and needs to be checked/replaced.",
+                    "Strap too big": "DW advised that equipment strap is too big and needs to be adjusted",
+                    "Strap too small": "DW advised that equipment strap is too small and needs to be adjusted",
+                    "Consent Withdrawn": "Consent withdrawn by Home owner, Equipment needs to be collected from the address.",
+                    "Decom": "Order ended, Equipment needs to be collected.",
+                    "Install": "New installation required for the device wearer.",
+                    "Equipment retrieval": "DW Order had ended and the equipment needs to be collected."
+                };
+
+                const today = new Date();
+                const mbdDate = new Date(today);
+                mbdDate.setDate(today.getDate() + 3);
+                const formattedMbdDate = `${String(mbdDate.getDate()).padStart(2, '0')}/${String(mbdDate.getMonth() + 1).padStart(2, '0')}/${mbdDate.getFullYear()}`;
+
+                const title = `AVR DW, MBD - ${formattedMbdDate}, SR10, ${vrState.age}, ${curfewText} - ${vrState.equip}`;
+                const body = `Curfew Hours: ${curfewText}\nEquipment Type: ${vrState.equip}\n\nVisit statement: ${statements[vrState.scenario] || ""}`;
+
+                document.getElementById('vr-title-output').value = title;
+                document.getElementById('vr-log-output').value = body;
+            });
+
+            const vrCopyTitle = document.getElementById('vr-copy-title-btn');
+            const vrCopyLog = document.getElementById('vr-copy-log-btn');
+            if(vrCopyTitle) vrCopyTitle.addEventListener('click', () => copyToClipboard(document.getElementById('vr-title-output').value, vrCopyTitle));
+            if(vrCopyLog) vrCopyLog.addEventListener('click', () => copyToClipboard(document.getElementById('vr-log-output').value, vrCopyLog));
+
+            // --- STREAMING_CHUNK:Local Storage & Visit Queue Integration... ---
+            let visitQueue = [];
+            const LOCAL_STORAGE_KEY = 'absence_generator_visit_queue';
+
+            const vqNameInput = document.getElementById('vq-name');
+            const vqOrderIdInput = document.getElementById('vq-order-id');
+            const vqReasonInput = document.getElementById('vq-reason');
+            const vqAddBtn = document.getElementById('vq-add-btn');
+            const vqClearBtn = document.getElementById('vq-clear-btn');
+            const vqList = document.getElementById('vq-list');
+            const queueBadge = document.getElementById('queue-badge');
+
+            // Save the current array into local storage
+            function saveQueueLocally() {
+                try {
+                    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(visitQueue));
+                } catch (e) {
+                    console.error("Local storage save failed", e);
+                }
+            }
+
+            // Load the array from local storage on startup
+            function loadQueueLocally() {
+                try {
+                    const savedData = localStorage.getItem(LOCAL_STORAGE_KEY);
+                    if (savedData) {
+                        visitQueue = JSON.parse(savedData);
+                    }
+                } catch (e) {
+                    console.error("Local storage load failed", e);
+                    visitQueue = [];
+                }
+                renderQueue();
+            }
+
+            function renderQueue() {
+                if(!vqList) return;
+                vqList.innerHTML = '';
+                let pending = 0;
+
+                if (visitQueue.length === 0) {
+                    vqList.innerHTML = `
+                        <div class="h-full flex flex-col items-center justify-center text-slate-500 mt-12">
+                            <div class="w-12 h-12 rounded-full bg-slate-800/50 flex items-center justify-center mb-3 border border-white/5">
+                                <svg class="w-6 h-6 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                            </div>
+                            <p class="text-[11px] font-mono uppercase tracking-widest">Queue is empty</p>
+                        </div>
+                    `;
+                } else {
+                    visitQueue.forEach((item) => {
+                        if (!item.done) pending++;
+                        
+                        const row = document.createElement('div');
+                        row.className = `grid grid-cols-[80px_1fr_1fr_1.5fr_80px] gap-4 items-center px-4 py-3 rounded-xl transition-all border-b border-white/5 last:border-0 hover:bg-slate-800/40 group ${item.done ? 'opacity-50 grayscale' : ''}`;
+                        
+                        // Status Checkbox
+                        const col1 = document.createElement('div');
+                        col1.className = 'flex justify-center items-center h-full';
+                        const cb = document.createElement('input');
+                        cb.type = 'checkbox';
+                        cb.checked = item.done;
+                        cb.className = 'custom-checkbox';
+                        cb.addEventListener('change', () => {
+                            item.done = cb.checked;
+                            saveQueueLocally();
+                            renderQueue();
+                        });
+                        col1.appendChild(cb);
+                        
+                        // Subject Name
+                        const col2 = document.createElement('div');
+                        const nameEl = document.createElement('span');
+                        nameEl.className = `font-bold text-[13px] font-mono cursor-pointer hover:text-cyan-400 transition-colors ${item.done ? 'line-through text-slate-500' : 'text-white'}`;
+                        nameEl.textContent = item.name;
+                        nameEl.title = "Click to copy name";
+                        nameEl.addEventListener('click', () => {
+                            copyToClipboard(item.name, null);
+                            showToast(`Copied ${item.name} to clipboard!`, 'success');
+                        });
+                        col2.appendChild(nameEl);
+
+                        // Order ID
+                        const col3 = document.createElement('div');
+                        const orderEl = document.createElement('span');
+                        orderEl.className = `font-bold text-[13px] font-mono cursor-pointer hover:text-cyan-400 transition-colors ${item.done ? 'line-through text-slate-500' : 'text-slate-300'}`;
+                        orderEl.textContent = item.orderId || '-';
+                        if (item.orderId) {
+                            orderEl.title = "Click to copy Order ID";
+                            orderEl.addEventListener('click', () => {
+                                copyToClipboard(item.orderId, null);
+                                showToast(`Copied ${item.orderId} to clipboard!`, 'success');
+                            });
+                        }
+                        col3.appendChild(orderEl);
+                        
+                        // Reason
+                        const col4 = document.createElement('div');
+                        const reasonEl = document.createElement('span');
+                        reasonEl.className = 'text-[13px] font-mono text-slate-300';
+                        reasonEl.textContent = item.reason;
+                        col4.appendChild(reasonEl);
+                        
+                        // Actions (Delete)
+                        const col5 = document.createElement('div');
+                        col5.className = 'flex justify-center items-center h-full';
+                        const delBtn = document.createElement('button');
+                        delBtn.className = 'text-slate-500 hover:text-rose-400 p-2 rounded-lg transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100';
+                        delBtn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>';
+                        delBtn.addEventListener('click', () => {
+                            visitQueue = visitQueue.filter(i => i.id !== item.id);
+                            saveQueueLocally();
+                            renderQueue();
+                            showToast("Item removed", "success");
+                        });
+                        col5.appendChild(delBtn);
+                        
+                        row.appendChild(col1);
+                        row.appendChild(col2);
+                        row.appendChild(col3);
+                        row.appendChild(col4);
+                        row.appendChild(col5);
+                        vqList.appendChild(row);
+                    });
+                }
+
+                if(queueBadge) {
+                    if (pending > 0) {
+                        queueBadge.textContent = pending;
+                        queueBadge.classList.remove('hidden');
+                    } else {
+                        queueBadge.classList.add('hidden');
+                    }
+                }
+            }
+
+            function addQueueItem() {
+                const name = vqNameInput.value.trim();
+                const orderId = vqOrderIdInput.value.trim();
+                const reason = vqReasonInput.value.trim();
+                
+                if (name && reason) {
+                    const newItem = {
+                        id: Date.now().toString(), 
+                        name: name, 
+                        orderId: orderId,
+                        reason: reason, 
+                        done: false 
+                    };
+                    
+                    visitQueue.push(newItem);
+                    saveQueueLocally(); // Instantly save to local storage
+                    renderQueue();
+                    
+                    showToast("Added to Visit Queue", "success");
+
+                    vqNameInput.value = '';
+                    vqOrderIdInput.value = '';
+                    vqReasonInput.value = '';
+                    vqNameInput.focus();
+                } else {
+                    showToast("Please enter a Name and Reason", "error");
+                }
+            }
+
+            // Event Listeners for Adding
+            if(vqAddBtn) vqAddBtn.addEventListener('click', addQueueItem);
+            
+            const handleEnter = (e) => { 
+                if (e.key === 'Enter') addQueueItem(); 
+            };
+            if(vqNameInput) vqNameInput.addEventListener('keypress', handleEnter);
+            if(vqOrderIdInput) vqOrderIdInput.addEventListener('keypress', handleEnter);
+            if(vqReasonInput) vqReasonInput.addEventListener('keypress', handleEnter);
+
+            // Clear Queue Button
+            if(vqClearBtn) {
+                vqClearBtn.addEventListener('click', () => {
+                    if(visitQueue.length === 0) {
+                        showToast("Queue is already empty", "warning");
+                        return;
+                    }
+                    
+                    visitQueue = [];
+                    saveQueueLocally(); // Save empty array to clear local storage
+                    renderQueue();
+                    showToast("Visit Queue Cleared", "success");
+                });
+            }
+
+            // Initial load from local storage
+            loadQueueLocally();
+        });
     </script>
 </body>
 </html>
