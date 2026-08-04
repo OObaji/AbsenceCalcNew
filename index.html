@@ -285,6 +285,35 @@
     <!-- Toast Notification Container -->
     <div id="toast-container" class="fixed bottom-5 right-5 z-[100] flex flex-col gap-3 pointer-events-none"></div>
 
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="hidden fixed inset-0 z-[200] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+        <div class="glass-panel rounded-3xl p-8 w-full max-w-md animate-enter">
+            <h3 class="font-display text-xl font-bold text-white mb-2">AI Settings</h3>
+            <p class="text-xs text-slate-400 leading-relaxed mb-5">Your Google Gemini API key is stored only in this browser (localStorage) and sent directly to Google's API to generate logs — it is never sent anywhere else. Get a free key at <span class="text-cyan-400">aistudio.google.com/apikey</span>.</p>
+            <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Google Gemini API Key</label>
+            <input type="password" id="settings-api-key" class="input-field w-full rounded-xl p-3 font-mono text-sm mb-6" placeholder="AIza...">
+            <div class="flex gap-3">
+                <button id="settings-cancel-btn" class="flex-1 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-sm uppercase tracking-wide transition-colors">Cancel</button>
+                <button id="settings-save-btn" class="flex-1 btn-action text-white font-bold py-3 rounded-xl text-sm uppercase tracking-wide">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- History Modal -->
+    <div id="history-modal" class="hidden fixed inset-0 z-[200] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+        <div class="glass-panel rounded-3xl p-8 w-full max-w-lg max-h-[80vh] flex flex-col animate-enter">
+            <div class="flex items-center justify-between mb-2">
+                <h3 class="font-display text-xl font-bold text-white">Log History</h3>
+                <button id="history-close-btn" class="text-slate-400 hover:text-white transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <p class="text-xs text-slate-400 mb-4">Your last 15 copied logs, saved in this browser.</p>
+            <div id="history-list" class="flex-1 overflow-y-auto custom-scrollbar space-y-3 pr-1"></div>
+            <button id="history-clear-btn" class="mt-5 py-2.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 border border-rose-500/30 text-xs font-bold uppercase tracking-wide transition-colors">Clear History</button>
+        </div>
+    </div>
+
     <!-- Top Navigation Bar -->
     <nav class="h-20 bg-slate-900/80 backdrop-blur-xl border-b border-slate-800 z-50 flex items-center justify-between px-8 lg:px-12 shrink-0 shadow-lg">
         <div class="flex items-center gap-4 group">
@@ -305,7 +334,9 @@
             </button>
         </div>
 
-        <div class="w-10"></div> <!-- Spacer -->
+        <button id="nav-settings-btn" class="w-10 h-10 rounded-xl flex items-center justify-center text-slate-400 hover:text-cyan-400 hover:bg-slate-800/60 transition-colors" title="AI Settings">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        </button>
     </nav>
 
     <!-- Main Content Area -->
@@ -317,6 +348,22 @@
                 
                 <!-- LEFT: Command Deck -->
                 <div class="lg:col-span-3 flex flex-col gap-8 animate-enter delay-100">
+                    <!-- Quick Capture (AI) -->
+                    <div class="glass-panel p-6 rounded-3xl border-t-2 border-violet-500/40 shadow-violet-500/10">
+                        <div class="flex items-center justify-between mb-3">
+                            <label class="text-xs font-bold text-violet-300 uppercase tracking-widest flex items-center gap-3">
+                                <span class="w-1.5 h-5 bg-violet-500 rounded-full"></span>
+                                Quick Capture (AI)
+                            </label>
+                            <span class="text-[10px] text-slate-500 font-mono">Ctrl/Cmd+Enter</span>
+                        </div>
+                        <textarea id="qc-input" class="input-field w-full h-20 rounded-2xl p-4 font-mono text-sm leading-relaxed" placeholder="Type what happened in your own words, e.g. &quot;DW called, stuck in traffic, on other line, home by 8pm&quot;..."></textarea>
+                        <button id="qc-generate-btn" class="w-full btn-action text-white font-bold py-3 rounded-xl shadow-lg uppercase tracking-wide text-sm mt-3 flex items-center justify-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+                            <span id="qc-generate-label">Generate Log</span>
+                        </button>
+                    </div>
+
                     <!-- Top Bar: Call Type -->
                     <div class="glass-panel p-2.5 rounded-3xl flex gap-3">
                         <button id="btn-type-inbound" class="toggle-btn flex-1 py-5 rounded-2xl flex items-center justify-center gap-3 font-display font-bold text-base tracking-wide transition-all">
@@ -475,29 +522,50 @@
 
                 <!-- RIGHT: Data Stream -->
                 <div class="lg:col-span-2 flex flex-col h-full gap-8 animate-enter delay-200">
-                    <div class="glass-panel p-8 rounded-3xl flex-1 flex flex-col bg-slate-900/80 border-t-4 border-cyan-500/50 shadow-cyan-500/10">
-                        <!-- Title Output -->
-                        <div class="mb-10">
-                            <div class="flex justify-between items-center mb-4">
-                                <label class="text-xs font-bold text-cyan-400 uppercase tracking-widest">Log Title</label>
-                                <button id="copy-title-btn" class="btn-copy h-9 px-4 rounded-lg text-xs font-bold uppercase tracking-wide gap-2">
-                                    Copy Title
+                    <div class="glass-panel p-6 lg:p-8 rounded-3xl flex-1 flex flex-col bg-slate-900/80 border-t-4 border-cyan-500/50 shadow-cyan-500/10 gap-5">
+                        
+                        <!-- Short Description Output -->
+                        <div>
+                            <div class="flex justify-between items-center mb-3">
+                                <label class="text-xs font-bold text-cyan-400 uppercase tracking-widest">Short description</label>
+                                <button id="copy-title-btn" class="btn-copy h-8 px-4 rounded-lg text-xs font-bold uppercase tracking-wide gap-2" title="Press 1 to copy">
+                                    Copy <span class="opacity-50 text-[10px] ml-1">[1]</span>
                                 </button>
                             </div>
-                            <input type="text" id="call-title-output" class="input-field w-full rounded-2xl p-4 font-mono text-sm text-white bg-slate-950 border-slate-800 transition-colors focus:border-cyan-500" placeholder="Type or generate title...">
+                            <input type="text" id="call-title-output" class="input-field w-full rounded-2xl p-4 font-mono text-sm text-white bg-slate-950 border-slate-800 transition-colors focus:border-cyan-500" placeholder="Type or generate description...">
                         </div>
 
-                        <!-- Body Output -->
+                        <!-- Chat Summary Output -->
+                        <div class="h-32 flex flex-col shrink-0">
+                            <div class="flex justify-between items-center mb-3">
+                                <label class="text-xs font-bold text-cyan-400 uppercase tracking-widest">Chat Summary</label>
+                                <div class="flex items-center gap-2">
+                                    <button id="history-open-btn" class="relative h-8 px-3 rounded-xl text-xs font-bold uppercase tracking-wide border border-slate-700 text-slate-300 hover:text-white hover:border-cyan-500/50 transition-colors flex items-center gap-2" title="Log History">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                        History
+                                        <span id="history-badge" class="hidden absolute -top-2 -right-2 bg-cyan-500 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center shadow-[0_0_10px_rgba(34,211,238,0.5)]">0</span>
+                                    </button>
+                                    <button id="copy-log-btn" class="btn-copy h-8 px-4 rounded-xl text-xs font-bold uppercase tracking-wide gap-2 shadow-[0_0_20px_rgba(56,189,248,0.2)]" title="Press 2 to copy">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 01-2-2V5"></path></svg>
+                                        Copy <span class="opacity-50 text-[10px] ml-1">[2]</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <textarea id="log-output" class="input-field w-full flex-1 rounded-2xl p-4 font-mono text-sm leading-relaxed resize-none bg-slate-950 border-slate-800 text-slate-300 custom-scrollbar" placeholder="Narrative summary will appear here..."></textarea>
+                        </div>
+
+                        <!-- Work Notes Output -->
                         <div class="flex-1 flex flex-col min-h-0">
-                            <div class="flex justify-between items-center mb-4">
-                                <label class="text-xs font-bold text-cyan-400 uppercase tracking-widest">Log Contents</label>
-                                <button id="copy-log-btn" class="btn-copy h-10 px-5 rounded-xl text-sm font-bold uppercase tracking-wide gap-2 shadow-[0_0_20px_rgba(56,189,248,0.2)]">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 01-2-2V5"></path></svg>
-                                    Copy Log
+                            <div class="flex justify-between items-center mb-3">
+                                <label class="text-xs font-bold text-cyan-400 uppercase tracking-widest">Work notes</label>
+                                <button id="copy-work-notes-btn" class="btn-copy h-8 px-4 rounded-xl text-xs font-bold uppercase tracking-wide gap-2 shadow-[0_0_20px_rgba(56,189,248,0.2)]" title="Press 3 to copy">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 01-2-2V5"></path></svg>
+                                    Copy <span class="opacity-50 text-[10px] ml-1">[3]</span>
                                 </button>
                             </div>
-                            <textarea id="log-output" class="input-field w-full flex-1 rounded-2xl p-5 font-mono text-sm leading-relaxed resize-none bg-slate-950 border-slate-800 text-slate-300" placeholder="// Log will be generated here automatically..."></textarea>
+                            <textarea id="work-notes-output" class="input-field w-full flex-1 rounded-2xl p-5 font-mono text-sm leading-relaxed resize-none bg-slate-950 border-slate-800 text-slate-300 custom-scrollbar" placeholder="Structured call log (Caller details, RV's, statements) will appear here..."></textarea>
                         </div>
+
                     </div>
                 </div>
 
@@ -507,9 +575,25 @@
         <!-- Page 3: Visit Request -->
         <div id="page-visit-request" class="page absolute inset-0 overflow-y-auto p-6 md:p-8 lg:p-10 animate-enter hidden">
             <div class="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div class="glass-panel rounded-3xl p-8 animate-enter delay-100">
-                    <h2 class="text-2xl font-display font-bold text-white mb-8">Visit Request</h2>
+                <div class="glass-panel rounded-3xl p-8 animate-enter delay-100 flex flex-col">
+                    <h2 class="text-2xl font-display font-bold text-white mb-6">Visit Request</h2>
                     
+                    <!-- Quick Capture (AI) -->
+                    <div class="glass-panel p-6 rounded-3xl border-t-2 border-violet-500/40 shadow-violet-500/10 mb-8">
+                        <div class="flex items-center justify-between mb-3">
+                            <label class="text-xs font-bold text-violet-300 uppercase tracking-widest flex items-center gap-3">
+                                <span class="w-1.5 h-5 bg-violet-500 rounded-full"></span>
+                                Quick Capture (AI)
+                            </label>
+                            <span class="text-[10px] text-slate-500 font-mono">Ctrl/Cmd+Enter</span>
+                        </div>
+                        <textarea id="vr-qc-input" class="input-field w-full h-20 rounded-2xl p-4 font-mono text-sm leading-relaxed" placeholder="e.g. DW complained about false absences, 19:00 - 00:00 RF..."></textarea>
+                        <button id="vr-qc-generate-btn" class="w-full btn-action text-white font-bold py-3 rounded-xl shadow-lg uppercase tracking-wide text-sm mt-3 flex items-center justify-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+                            <span id="vr-qc-generate-label">Draft Request</span>
+                        </button>
+                    </div>
+
                     <div class="mb-6">
                         <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Equipment Type</label>
                         <div class="grid grid-cols-2 gap-4">
@@ -830,6 +914,10 @@
                 updateLogOutput();
             }
 
+            if(btnDw) btnDw.addEventListener('click', () => { clState.caller = 'DW'; document.getElementById('call-log-custom-details').value = ''; if(document.getElementById('qc-input')) document.getElementById('qc-input').value = ''; updateCallerUI(); renderScenarioButtons(); });
+            if(btnRel) btnRel.addEventListener('click', () => { clState.caller = 'Others'; document.getElementById('call-log-custom-details').value = ''; if(document.getElementById('qc-input')) document.getElementById('qc-input').value = ''; updateCallerUI(); renderScenarioButtons(); });
+            if(btnPol) btnPol.addEventListener('click', () => { clState.caller = 'Police'; document.getElementById('call-log-custom-details').value = ''; if(document.getElementById('qc-input')) document.getElementById('qc-input').value = ''; updateCallerUI(); renderScenarioButtons(); });
+
             if(btnViolDenied) btnViolDenied.addEventListener('click', () => { clState.violationStatus = 'denied'; updateViolationUI(); updateScenarioExtrasVisibility(); updateResolutionUI(); });
             if(btnViolAdmitted) btnViolAdmitted.addEventListener('click', () => { clState.violationStatus = 'admitted'; updateViolationUI(); updateScenarioExtrasVisibility(); updateResolutionUI(); });
 
@@ -960,18 +1048,34 @@
                 } else {
                     events = scenarios[clState.type] || [];
                 }
-                
+
                 events.forEach((evt, index) => {
                     const btn = document.createElement('button');
                     btn.className = `scenario-btn w-full h-16 rounded-2xl text-sm font-bold text-slate-300 transition-all uppercase tracking-wide ${clState.event === evt ? 'selected' : ''} animate-enter`;
                     btn.style.animationDelay = `${index * 50}ms`;
                     btn.textContent = evt;
                     btn.addEventListener('click', () => {
+                        // Auto-clear context when changing scenarios
+                        if (clState.event !== evt) {
+                            const customInput = document.getElementById('call-log-custom-details');
+                            if (customInput) customInput.value = '';
+                            if (document.getElementById('qc-input')) document.getElementById('qc-input').value = '';
+                            
+                            const titleOut = document.getElementById('call-title-output');
+                            if (titleOut) {
+                                titleOut.dataset.manuallyEdited = "";
+                                titleOut.dataset.lastAuto = "";
+                            }
+                        }
+
                         clState.event = evt;
                         clState.violationStatus = 'denied'; // default to denial when switching scenarios
                         clState.resolutionStatus = 'resolved'; // reset resolution too
+                        clState.visitEnquiryType = 'pending';
+                        
                         updateViolationUI();
                         updateResolutionUI();
+                        updateVisitEnquiryUI();
                         renderScenarioButtons();
                         updateScenarioExtrasVisibility();
                         updateLogOutput();
@@ -1008,6 +1112,8 @@
                 btnInbound.addEventListener('click', () => {
                     clState.type = "Incoming Call";
                     clState.event = null;
+                    document.getElementById('call-log-custom-details').value = '';
+                    if(document.getElementById('qc-input')) document.getElementById('qc-input').value = '';
                     updateCallTypeUI();
                     renderScenarioButtons();
                     updateScenarioExtrasVisibility();
@@ -1016,6 +1122,8 @@
                 btnPd.addEventListener('click', () => {
                     clState.type = "PD Call";
                     clState.event = null;
+                    document.getElementById('call-log-custom-details').value = '';
+                    if(document.getElementById('qc-input')) document.getElementById('qc-input').value = '';
                     updateCallTypeUI();
                     renderScenarioButtons();
                     updateScenarioExtrasVisibility();
@@ -1088,31 +1196,25 @@
                 let newTitle = "";
 
                 if (clState.caller !== 'DW') {
-                    const callAction = clState.type === 'Incoming Call' ? 'called' : 'answered';
-                    
                     if (clState.caller === 'Others') {
                         const relInput = document.getElementById('cl-rel-relation').value.trim();
                         const rel = relInput || 'Other person';
                         const statementPrefix = relInput ? `DW's ${relInput}` : 'Other person';
                         
-                        newTitle = `${clState.type} - ${relInput ? "DW's " + relInput : "Other person"}`;
+                        if (clState.event && clState.event !== 'Other Default') {
+                            newTitle = clState.event;
+                        } else {
+                            newTitle = relInput ? `DW's ${relInput}` : 'Other person';
+                        }
                         
                         let callStatementStr = "";
-                        let onBehalfStr = clState.type === 'PD Call' ? 'answered the phone on behalf of DW / with DW\'s device and ' : '';
-                        
-                        if (clState.event === 'LHDC - DW sleeping') {
-                            callStatementStr = `${statementPrefix} ${onBehalfStr}stated that DW is currently sleeping and had not left home during the curfew. ${customText}`;
-                        } else if (clState.event === 'OPC - DW running late') {
-                            callStatementStr = `${statementPrefix} ${onBehalfStr}stated that DW is currently running late and is currently on his way. ${customText}`;
+                        if (clState.type === 'PD Call') {
+                            callStatementStr = `${statementPrefix} answered the phone on behalf of DW / with DW's device and stated that ${customText}`;
                         } else {
-                            if (clState.type === 'PD Call') {
-                                callStatementStr = `${statementPrefix} answered the phone on behalf of DW / with DW's device and stated that ${customText}`;
-                            } else {
-                                // Incoming calls
-                                callStatementStr = `${statementPrefix} stated that ${customText}`;
-                            }
+                            // Incoming calls
+                            callStatementStr = `${statementPrefix} stated that ${customText}`;
                         }
-                        rawLog = `Caller details: ${rel} (Other) ${callAction}\nRV's confirmed: Name, Address\nCaller statement: ${callStatementStr}\nAgents statement: I advised that the call will be documented\nFurther actions required: N/A`;
+                        rawLog = `Caller details: ${rel} (Other)\nRV's confirmed: Name, Address\nCaller statement: ${callStatementStr}\nAgents statement: I advised that the call will be documented\nFurther actions required: N/A`;
                     } else if (clState.caller === 'Police') {
                         const pName = document.getElementById('cl-pol-name').value.trim();
                         const pBadge = document.getElementById('cl-pol-badge').value.trim();
@@ -1121,13 +1223,13 @@
                         const officerStr = pName ? `Police officer ${pName}` : 'Police officer';
                         const statementPrefix = pName ? pName : 'Police officer';
                         
-                        newTitle = `${clState.type} - Police`;
+                        newTitle = clState.event || 'Police';
                         
                         if (clState.type === 'Incoming Call') {
                             // Incoming calls: Statement before Agent's statement
-                            rawLog = `Caller details: ${officerStr} ${callAction}\nBadge Number: ${pBadge || 'N/A'}\nPolice station: ${pStation || 'N/A'}\nRV's confirmed: ${pPass}\nCaller statement: ${statementPrefix} stated that ${customText}\nAgents statement: I advised that the call will be documented\nFurther actions required: N/A`;
+                            rawLog = `Caller details: ${officerStr}\nBadge Number: ${pBadge || 'N/A'}\nPolice station: ${pStation || 'N/A'}\nRV's confirmed: ${pPass}\nCaller statement: ${statementPrefix} stated that ${customText}\nAgents statement: I advised that the call will be documented\nFurther actions required: N/A`;
                         } else {
-                            rawLog = `Caller details: ${officerStr} ${callAction}\nBadge Number: ${pBadge || 'N/A'}\nPolice station: ${pStation || 'N/A'}\nRV's confirmed: ${pPass}\nAgents statement: I advised that the call will be documented\nCaller statement: ${statementPrefix} stated that ${customText}\nFurther actions required: N/A`;
+                            rawLog = `Caller details: ${officerStr}\nBadge Number: ${pBadge || 'N/A'}\nPolice station: ${pStation || 'N/A'}\nRV's confirmed: ${pPass}\nAgents statement: I advised that the call will be documented\nCaller statement: ${statementPrefix} stated that ${customText}\nFurther actions required: N/A`;
                         }
                     }
                     
@@ -1136,7 +1238,15 @@
                         rawLog = rawLog.replace(/Further actions required: N\/A/i, "Further actions required: Visit required");
                     }
                     
-                    logOut.value = rawLog;
+                    let chatSum = "";
+                    let cName = clState.caller === 'Others' ? (document.getElementById('cl-rel-relation').value.trim() || 'Other person') : (document.getElementById('cl-pol-name').value.trim() ? "Police officer " + document.getElementById('cl-pol-name').value.trim() : "Police officer");
+                    let act = clState.type === 'PD Call' ? 'answered the phone regarding' : 'called regarding';
+                    let top = clState.event ? clState.event.toLowerCase() : 'an incident';
+                    if (clState.event === 'Other Default' || !clState.event) top = 'general update';
+                    chatSum = `${cName} ${act} ${top}. ${customText}`.trim();
+                    
+                    logOut.value = chatSum;
+                    if (document.getElementById('work-notes-output')) document.getElementById('work-notes-output').value = rawLog;
                     
                     // Smart Title Overwrite Logic
                     if (!titleOut.dataset.manuallyEdited || titleOut.dataset.lastAuto === titleOut.value) {
@@ -1152,16 +1262,11 @@
                         titleOut.dataset.lastAuto = '';
                     }
                     logOut.value = '';
+                    if (document.getElementById('work-notes-output')) document.getElementById('work-notes-output').value = '';
                     return;
                 }
 
-                if (clState.event === 'Other incident' || clState.event === 'Other incidents' || clState.event === 'DW called') {
-                    newTitle = `${clState.type} - ${clState.event}`;
-                } else if (clState.event === 'No response') {
-                    newTitle = `${clState.type} - No response`;
-                } else {
-                    newTitle = `${clState.type} - ${clState.event}`;
-                }
+                newTitle = clState.event;
 
                 // Smart Title Overwrite Logic
                 if (!titleOut.dataset.manuallyEdited || titleOut.dataset.lastAuto === titleOut.value) {
@@ -1386,27 +1491,58 @@ Further actions required: N/A`
 
                 // --- SMART HEADER INJECTION (Caller Identity) ---
                 if (!rawLog || rawLog === "No response") {
-                    logOut.value = rawLog;
+                    logOut.value = rawLog === "No response" ? "No response." : "";
+                    if (document.getElementById('work-notes-output')) document.getElementById('work-notes-output').value = rawLog;
                     return;
                 }
 
                 let rvStatus = (clState.event === 'Call got disconnected') ? 'Not confirmed' : 'Name, DOB, Address';
-                let customHeader = `Caller details: Device wearer ${clState.type === 'Incoming Call' ? 'called' : 'answered'}\nRV's confirmed: ${rvStatus}\n`;
+                let customHeader = `Caller details: Device wearer\nRV's confirmed: ${rvStatus}\n`;
 
                 // Smart Regex to inject the header without deleting the statements
                 const headerRegex = /^Caller details:[\s\S]*?(?=Agents statement:|Agent'?s? statement:|DW's statement:|Caller statement:)/i;
                 
                 if (rawLog.match(headerRegex)) {
-                    logOut.value = rawLog.replace(headerRegex, customHeader);
+                    rawLog = rawLog.replace(headerRegex, customHeader);
                 } else {
-                    logOut.value = customHeader + rawLog; // Fallback
+                    rawLog = customHeader + rawLog; // Fallback
                 }
+
+                let chatSum = "";
+                if (clState.event === "Call got disconnected") {
+                    chatSum = "Call got disconnected.";
+                } else {
+                    let act = clState.type === 'PD Call' ? 'was contacted regarding' : 'called regarding';
+                    let top = clState.event ? clState.event.toLowerCase() : 'an incident';
+                    if (clState.event === 'DW called' || clState.event === 'Other incident') top = 'general update';
+                    chatSum = `Device wearer ${act} ${top}. ${customText}`.trim();
+                }
+
+                logOut.value = chatSum;
+                if (document.getElementById('work-notes-output')) document.getElementById('work-notes-output').value = rawLog;
             }
 
             const copyCallTitleBtn = document.getElementById('copy-title-btn');
             const copyCallLogBtn = document.getElementById('copy-log-btn');
+            const copyWorkNotesBtn = document.getElementById('copy-work-notes-btn');
+            
             if(copyCallTitleBtn) copyCallTitleBtn.addEventListener('click', () => copyToClipboard(document.getElementById('call-title-output').value, copyCallTitleBtn));
             if(copyCallLogBtn) copyCallLogBtn.addEventListener('click', () => copyToClipboard(document.getElementById('log-output').value, copyCallLogBtn));
+            if(copyWorkNotesBtn) copyWorkNotesBtn.addEventListener('click', () => copyToClipboard(document.getElementById('work-notes-output').value, copyWorkNotesBtn));
+
+            // Keyboard Shortcuts for Copying
+            document.addEventListener('keydown', (e) => {
+                // Ignore if user is typing in an input field or textarea
+                const isTyping = document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA';
+                // Only active when Call Log page is visible
+                const isCallLogPage = !document.getElementById('page-call-log').classList.contains('hidden');
+                
+                if (!isTyping && isCallLogPage) {
+                    if (e.key === '1' && copyCallTitleBtn) copyCallTitleBtn.click();
+                    if (e.key === '2' && copyCallLogBtn) copyCallLogBtn.click();
+                    if (e.key === '3' && copyWorkNotesBtn) copyWorkNotesBtn.click();
+                }
+            });
 
             function resetCallLog() {
                 // 1. Reset state (keep current INCOMING / PD type, but reset everything else)
@@ -1450,6 +1586,9 @@ Further actions required: N/A`
                 document.getElementById('cl-visit-id').value = '';
                 document.getElementById('cl-visit-reason').value = '';
 
+                if (document.getElementById('qc-input')) document.getElementById('qc-input').value = '';
+                if (document.getElementById('work-notes-output')) document.getElementById('work-notes-output').value = '';
+
                 // 4. Update UI to reflect changes
                 updateCallerUI();
                 updateResolutionUI();
@@ -1465,6 +1604,423 @@ Further actions required: N/A`
             updateCallTypeUI(); // Ensure initial load hides Police button since default is PD Call
             renderScenarioButtons();
 
+            // --- AI Quick Capture ---
+            const API_KEY_STORAGE_KEY = 'absence_generator_gemini_key';
+            const getApiKey = () => localStorage.getItem(API_KEY_STORAGE_KEY) || '';
+            const setApiKey = (key) => localStorage.setItem(API_KEY_STORAGE_KEY, key);
+
+            const settingsModal = document.getElementById('settings-modal');
+            const openSettingsModal = () => {
+                const input = document.getElementById('settings-api-key');
+                if (input) input.value = getApiKey();
+                if (settingsModal) settingsModal.classList.remove('hidden');
+            };
+            const closeSettingsModal = () => { if (settingsModal) settingsModal.classList.add('hidden'); };
+
+            document.getElementById('nav-settings-btn')?.addEventListener('click', openSettingsModal);
+            document.getElementById('settings-cancel-btn')?.addEventListener('click', closeSettingsModal);
+            document.getElementById('settings-save-btn')?.addEventListener('click', () => {
+                setApiKey(document.getElementById('settings-api-key').value.trim());
+                closeSettingsModal();
+                showToast('API key saved', 'success');
+            });
+            settingsModal?.addEventListener('click', (e) => { if (e.target === settingsModal) closeSettingsModal(); });
+
+            function buildQcSystemPrompt() {
+                return `You convert a short, informal note from an electronic-monitoring call agent into structured fields for a call-log generator. Respond with ONLY a single JSON object - no markdown, no code fences, no commentary before or after.
+
+Fields to return:
+- callType: "Incoming Call" (device wearer or someone else called in) or "PD Call" (the agent proactively called the device wearer, e.g. about a curfew violation).
+- caller: "DW" (device wearer), "Others" (a relative/friend calling on DW's behalf), or "Police" (a police officer called).
+- scenario: Pick the SINGLE most specific incident match. 
+  CRITICAL CLASSIFICATION RULES:
+  - DO NOT pick generic options like "DW called" or "Other incident" if a specific violation/incident applies.
+  - "Left home during the curfew": Use if the note mentions being in the garden, driveway, taking out bins, or stepping outside during curfew hours.
+  - "Out past curfew": Use if the note mentions returning late, stuck in traffic, coming home late, or missing the start of curfew.
+  - "DW called" (Incoming) / "Other incident" (PD): Use ONLY for general information updates (e.g., household electricity will be off, general queries) that do not fit any specific incident.
+  - Options for "DW" PD Call: ${JSON.stringify(scenarios["PD Call"])}
+  - Options for "DW" Incoming Call: ${JSON.stringify(scenarios["Incoming Call"])}
+  - Options for "Others": ${JSON.stringify(["Other Default", "LHDC - DW sleeping", "OPC - DW running late"])}
+  - Use "No response" only if the note explicitly says there was no answer.
+- detail: a short, natural continuation clause describing what happened, written to slot into a fixed template AFTER a lead-in phrase like "Device wearer advised that ...". Do not repeat "DW advised" or similar preamble, do not restate the caller or scenario. Factual, professional, third person, 5-25 words. Omit only if there is truly nothing to add beyond the scenario itself.
+- violationStatus: "denied" or "admitted" - only include when scenario is "Equipment tamper" or "Equipment power off". Default "denied" unless the note says DW admitted or confirmed the issue.
+- resolutionStatus: "resolved" or "unresolved" - only include when scenario is "Equipment power off" and violationStatus is "admitted".
+- visitEnquiryType: "pending", "missed", or "new" - only include when scenario is "Visit enquiries".
+- hospitalName: only include when scenario is "Hospital" and a hospital name is mentioned.
+- visitRequired: true if the note implies a field visit should be requested, otherwise false or omitted.
+- relationName: relationship or name of the caller - only include when caller is "Others" (e.g. "Mother", "Partner").
+- policeOfficerName, policeBadge, policeStation: only include when caller is "Police" and mentioned in the note.
+
+Respond with JSON only.`;
+            }
+
+            function extractJson(text) {
+                const start = text.indexOf('{');
+                const end = text.lastIndexOf('}');
+                if (start === -1 || end === -1 || end < start) throw new Error("Could not parse the model's response");
+                return text.slice(start, end + 1);
+            }
+
+            async function callGeminiForQuickCapture(notes, apiKey) {
+                const model = 'gemini-3.6-flash';
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`;
+                const res = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ role: 'user', parts: [{ text: notes }] }],
+                        systemInstruction: { parts: [{ text: buildQcSystemPrompt() }] },
+                        generationConfig: { responseMimeType: 'application/json', temperature: 0.3 }
+                    })
+                });
+
+                if (!res.ok) {
+                    const errBody = await res.json().catch(() => ({}));
+                    throw new Error(errBody?.error?.message || `Request failed (${res.status})`);
+                }
+
+                const data = await res.json();
+                const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (!text) throw new Error('No response from model');
+
+                const parsed = JSON.parse(extractJson(text));
+                if (!parsed.callType || !parsed.caller) throw new Error('Unexpected response shape');
+                return parsed;
+            }
+
+            // --- Visit Request AI Logic ---
+            function buildVrQcSystemPrompt() {
+                return `You convert informal notes into structured data for a field visit request. Respond with ONLY a single JSON object.
+
+Fields to return:
+- equip: "RF" or "GPS". If unmentioned, infer from context if possible, or omit.
+- age: "Adult" or "Child". Default to "Adult".
+- curfewStart: Time in "HH:MM" 24h format, or null.
+- curfewEnd: Time in "HH:MM" 24h format, or null.
+- noCurfew: true or false. Set to true if "NC" or "no curfew" is explicitly mentioned.
+- scenario: Pick the SINGLE most specific match from this list: ["Equipment Tamper", "Equipment Charger request", "Equipment Check", "Equipment Re-Range", "HMU replacement", "Strap too big", "Strap too small", "Consent Withdrawn", "Decom", "Install", "Equipment retrieval"]. Example: "false absences" usually means "Equipment Check" or "Equipment Re-Range".
+- details: A formal, professional, third-person summary of the issue for the field officer (e.g., "Device wearer reported false absence alerts occurring during the curfew..."). Keep it concise and professional.
+
+Respond with JSON only.`;
+            }
+
+            function applyVrQcResult(result) {
+                // Apply Age
+                if (result.age === "Child") {
+                    document.getElementById('vr-age-child')?.click();
+                } else {
+                    document.getElementById('vr-age-adult')?.click();
+                }
+
+                // Apply Equip
+                if (result.equip === "RF") document.getElementById('vr-equip-rf')?.click();
+                else if (result.equip === "GPS") document.getElementById('vr-equip-gps')?.click();
+
+                // Apply Curfew
+                const noCurfewCb = document.getElementById('vr-no-curfew');
+                if (result.noCurfew) {
+                    if (!noCurfewCb.checked) noCurfewCb.click();
+                } else {
+                    if (noCurfewCb.checked) noCurfewCb.click();
+                    if (result.curfewStart) document.getElementById('vr-curfew-start').value = result.curfewStart;
+                    if (result.curfewEnd) document.getElementById('vr-curfew-end').value = result.curfewEnd;
+                }
+
+                // Apply Scenario
+                if (result.scenario) {
+                    const scenarioBtns = document.querySelectorAll('#vr-scenario-buttons .scenario-btn');
+                    scenarioBtns.forEach(btn => {
+                        if (btn.textContent === result.scenario) btn.click();
+                    });
+                }
+
+                // Apply Custom Details
+                if (result.details) {
+                    document.getElementById('vr-custom-details').value = result.details;
+                }
+
+                // Auto-generate the log
+                setTimeout(() => {
+                    document.getElementById('vr-generate-log-btn')?.click();
+                }, 150);
+            }
+
+            async function generateVrFromNotes() {
+                const qcInput = document.getElementById('vr-qc-input');
+                const notes = qcInput ? qcInput.value.trim() : '';
+                if (!notes) {
+                    showToast('Type a quick note first', 'error');
+                    return;
+                }
+                const apiKey = getApiKey();
+                if (!apiKey) {
+                    showToast('Add your Google Gemini API key in Settings first', 'error');
+                    openSettingsModal();
+                    return;
+                }
+
+                const btn = document.getElementById('vr-qc-generate-btn');
+                const label = document.getElementById('vr-qc-generate-label');
+                btn.disabled = true;
+                btn.classList.add('opacity-60', 'cursor-not-allowed');
+                label.textContent = 'Thinking…';
+
+                try {
+                    const model = 'gemini-3.6-flash';
+                    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`;
+                    const res = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{ role: 'user', parts: [{ text: notes }] }],
+                            systemInstruction: { parts: [{ text: buildVrQcSystemPrompt() }] },
+                            generationConfig: { responseMimeType: 'application/json', temperature: 0.3 }
+                        })
+                    });
+
+                    if (!res.ok) throw new Error('Request failed');
+                    const data = await res.json();
+                    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+                    if (!text) throw new Error('No response from model');
+
+                    const parsed = JSON.parse(extractJson(text));
+                    applyVrQcResult(parsed);
+                    showToast('Visit Request drafted!', 'success');
+                } catch (err) {
+                    console.error(err);
+                    showToast('Could not generate — try rephrasing', 'error');
+                } finally {
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-60', 'cursor-not-allowed');
+                    label.textContent = 'Draft Request';
+                }
+            }
+
+            document.getElementById('vr-qc-generate-btn')?.addEventListener('click', generateVrFromNotes);
+            document.getElementById('vr-qc-input')?.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+                    e.preventDefault();
+                    generateVrFromNotes();
+                }
+            });
+
+            function applyQcResult(result) {
+                // Clear manual title edit lock so AI generation updates title output
+                const titleOut = document.getElementById('call-title-output');
+                if (titleOut) {
+                    titleOut.dataset.manuallyEdited = "";
+                    titleOut.dataset.lastAuto = "";
+                }
+
+                clState.type = result.callType === 'PD Call' ? 'PD Call' : 'Incoming Call';
+                updateCallTypeUI();
+
+                clState.caller = ['DW', 'Others', 'Police'].includes(result.caller) ? result.caller : 'DW';
+                if (clState.caller === 'Others' && document.getElementById('cl-rel-relation')) {
+                    document.getElementById('cl-rel-relation').value = result.relationName || '';
+                }
+                if (clState.caller === 'Police') {
+                    if (document.getElementById('cl-pol-name')) document.getElementById('cl-pol-name').value = result.policeOfficerName || '';
+                    if (document.getElementById('cl-pol-badge')) document.getElementById('cl-pol-badge').value = result.policeBadge || '';
+                    if (document.getElementById('cl-pol-station')) document.getElementById('cl-pol-station').value = result.policeStation || '';
+                }
+                updateCallerUI();
+
+                clState.event = result.scenario || null;
+                clState.violationStatus = result.violationStatus === 'admitted' ? 'admitted' : 'denied';
+                clState.resolutionStatus = result.resolutionStatus === 'unresolved' ? 'unresolved' : 'resolved';
+                clState.visitEnquiryType = ['pending', 'missed', 'new'].includes(result.visitEnquiryType) ? result.visitEnquiryType : 'pending';
+
+                if (document.getElementById('cl-hosp-name')) document.getElementById('cl-hosp-name').value = result.hospitalName || '';
+
+                renderScenarioButtons();
+                updateScenarioExtrasVisibility();
+                updateViolationUI();
+                updateResolutionUI();
+                updateVisitEnquiryUI();
+
+                if (clCustomInput) clCustomInput.value = result.detail || '';
+
+                if (clVisitReq) {
+                    clVisitReq.checked = !!result.visitRequired;
+                    if (clVisitInputs) clVisitInputs.classList.toggle('hidden', !clVisitReq.checked);
+                }
+
+                updateLogOutput();
+            }
+
+            function setQcLoading(loading) {
+                const btn = document.getElementById('qc-generate-btn');
+                const label = document.getElementById('qc-generate-label');
+                if (!btn || !label) return;
+                btn.disabled = loading;
+                btn.classList.toggle('opacity-60', loading);
+                btn.classList.toggle('cursor-not-allowed', loading);
+                label.textContent = loading ? 'Thinking…' : 'Generate Log';
+            }
+
+            async function generateFromNotes() {
+                const qcInput = document.getElementById('qc-input');
+                const notes = qcInput ? qcInput.value.trim() : '';
+                if (!notes) {
+                    showToast('Type a quick note first', 'error');
+                    return;
+                }
+                const apiKey = getApiKey();
+                if (!apiKey) {
+                    showToast('Add your Google Gemini API key in Settings first', 'error');
+                    openSettingsModal();
+                    return;
+                }
+
+                setQcLoading(true);
+                try {
+                    const result = await callGeminiForQuickCapture(notes, apiKey);
+                    applyQcResult(result);
+                    showToast('Log drafted — review before copying', 'success');
+                } catch (err) {
+                    console.error(err);
+                    showToast(err.message || 'Could not generate — try rephrasing or fill manually', 'error');
+                } finally {
+                    setQcLoading(false);
+                }
+            }
+
+            document.getElementById('qc-generate-btn')?.addEventListener('click', generateFromNotes);
+            document.getElementById('qc-input')?.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+                    e.preventDefault();
+                    generateFromNotes();
+                }
+            });
+
+            // --- Log History ---
+            const HISTORY_STORAGE_KEY = 'absence_generator_call_log_history';
+            const HISTORY_LIMIT = 15;
+            let callLogHistory = [];
+
+            function loadHistory() {
+                try {
+                    const raw = localStorage.getItem(HISTORY_STORAGE_KEY);
+                    callLogHistory = raw ? JSON.parse(raw) : [];
+                } catch (e) {
+                    callLogHistory = [];
+                }
+            }
+
+            function saveHistory() {
+                try { localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(callLogHistory)); } catch (e) {}
+            }
+
+            function timeAgo(ts) {
+                const diffSec = Math.max(0, Math.floor((Date.now() - ts) / 1000));
+                if (diffSec < 60) return 'just now';
+                const diffMin = Math.floor(diffSec / 60);
+                if (diffMin < 60) return `${diffMin}m ago`;
+                const diffHr = Math.floor(diffMin / 60);
+                if (diffHr < 24) return `${diffHr}h ago`;
+                const diffDay = Math.floor(diffHr / 24);
+                return `${diffDay}d ago`;
+            }
+
+            function renderHistoryBadge() {
+                const badge = document.getElementById('history-badge');
+                if (!badge) return;
+                if (callLogHistory.length > 0) {
+                    badge.textContent = callLogHistory.length > 99 ? '99+' : String(callLogHistory.length);
+                    badge.classList.remove('hidden');
+                } else {
+                    badge.classList.add('hidden');
+                }
+            }
+
+            function renderHistoryList() {
+                const list = document.getElementById('history-list');
+                if (!list) return;
+                list.innerHTML = '';
+                if (callLogHistory.length === 0) {
+                    list.innerHTML = '<div class="text-center text-slate-500 text-xs font-mono py-10">No copied logs yet.</div>';
+                    return;
+                }
+                [...callLogHistory].reverse().forEach(entry => {
+                    const row = document.createElement('div');
+                    row.className = 'p-4 rounded-xl bg-slate-900/50 border border-white/5 hover:border-cyan-500/30 transition-colors';
+
+                    const header = document.createElement('div');
+                    header.className = 'flex items-center justify-between gap-3 mb-2';
+                    const titleEl = document.createElement('div');
+                    titleEl.className = 'text-xs font-bold text-slate-200 truncate flex-1';
+                    titleEl.textContent = entry.title || '(untitled)';
+                    titleEl.title = entry.title || '';
+                    const timeEl = document.createElement('span');
+                    timeEl.className = 'text-[10px] text-slate-500 font-mono shrink-0';
+                    timeEl.textContent = timeAgo(entry.timestamp);
+                    header.appendChild(titleEl);
+                    header.appendChild(timeEl);
+
+                    const actions = document.createElement('div');
+                    actions.className = 'flex gap-2';
+                    const copyBtn = document.createElement('button');
+                    copyBtn.className = 'flex-1 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wide bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 border border-cyan-500/20 transition-colors';
+                    copyBtn.textContent = 'Copy';
+                    copyBtn.addEventListener('click', () => {
+                        copyToClipboard(entry.log, null);
+                        showToast('Log copied', 'success');
+                    });
+                    const loadBtn = document.createElement('button');
+                    loadBtn.className = 'flex-1 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wide bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors';
+                    loadBtn.textContent = 'Load';
+                    loadBtn.addEventListener('click', () => {
+                        const titleOut = document.getElementById('call-title-output');
+                        const logOut = document.getElementById('log-output');
+                        if (titleOut) { titleOut.value = entry.title || ''; titleOut.dataset.manuallyEdited = 'true'; }
+                        if (logOut) logOut.value = entry.log || '';
+                        closeHistoryModal();
+                        showToast('Log loaded from history', 'success');
+                    });
+                    actions.appendChild(copyBtn);
+                    actions.appendChild(loadBtn);
+
+                    row.appendChild(header);
+                    row.appendChild(actions);
+                    list.appendChild(row);
+                });
+            }
+
+            function pushToHistory(title, log) {
+                if (!log || !log.trim()) return;
+                const last = callLogHistory[callLogHistory.length - 1];
+                if (last && last.title === title && last.log === log) return;
+                callLogHistory.push({ id: Date.now().toString(), title: title || '', log, timestamp: Date.now() });
+                if (callLogHistory.length > HISTORY_LIMIT) callLogHistory = callLogHistory.slice(-HISTORY_LIMIT);
+                saveHistory();
+                renderHistoryBadge();
+            }
+
+            const historyModal = document.getElementById('history-modal');
+            const openHistoryModal = () => { renderHistoryList(); if (historyModal) historyModal.classList.remove('hidden'); };
+            const closeHistoryModal = () => { if (historyModal) historyModal.classList.add('hidden'); };
+
+            document.getElementById('history-open-btn')?.addEventListener('click', openHistoryModal);
+            document.getElementById('history-close-btn')?.addEventListener('click', closeHistoryModal);
+            historyModal?.addEventListener('click', (e) => { if (e.target === historyModal) closeHistoryModal(); });
+            document.getElementById('history-clear-btn')?.addEventListener('click', () => {
+                if (callLogHistory.length === 0) {
+                    showToast('History is already empty', 'warning');
+                    return;
+                }
+                callLogHistory = [];
+                saveHistory();
+                renderHistoryBadge();
+                renderHistoryList();
+                showToast('History cleared', 'success');
+            });
+            document.getElementById('copy-log-btn')?.addEventListener('click', () => {
+                pushToHistory(document.getElementById('call-title-output').value, document.getElementById('log-output').value);
+            });
+
+            loadHistory();
+            renderHistoryBadge();
 
             // --- STREAMING_CHUNK:Initializing Visit Request Logic... ---
             // --- Visit Request Logic ---
@@ -1539,13 +2095,23 @@ Further actions required: N/A`
                     "Equipment retrieval": "DW Order had ended and the equipment needs to be collected."
                 };
 
+                const customDetails = document.getElementById('vr-custom-details').value.trim();
+                let visitStatement = statements[vrState.scenario] || "";
+                if (customDetails) {
+                    if (visitStatement) {
+                        visitStatement += `\nAdditional Notes: ${customDetails}`;
+                    } else {
+                        visitStatement = customDetails;
+                    }
+                }
+
                 const today = new Date();
                 const mbdDate = new Date(today);
                 mbdDate.setDate(today.getDate() + 3);
                 const formattedMbdDate = `${String(mbdDate.getDate()).padStart(2, '0')}/${String(mbdDate.getMonth() + 1).padStart(2, '0')}/${mbdDate.getFullYear()}`;
 
                 const title = `AVR DW, MBD - ${formattedMbdDate}, SR10, ${vrState.age}, ${curfewText} - ${vrState.equip}`;
-                const body = `Curfew Hours: ${curfewText}\nEquipment Type: ${vrState.equip}\n\nVisit statement: ${statements[vrState.scenario] || ""}`;
+                const body = `Curfew Hours: ${curfewText}\nEquipment Type: ${vrState.equip}\n\nVisit statement: ${visitStatement}`;
 
                 document.getElementById('vr-title-output').value = title;
                 document.getElementById('vr-log-output').value = body;
